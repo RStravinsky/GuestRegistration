@@ -4,5 +4,9 @@
         <file>images/sigma.png</file>
         <file>images/icon.ico</file>
         <file>images/loginIcon.ico</file>
+        <file>images/help.png</file>
+        <file>images/logout.png</file>
+        <file>images/print.png</file>
+        <file>images/save.png</file>
     </qresource>
 </RCC>

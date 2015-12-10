@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
         QApplication a(argc, argv);
         LoginDialog *loginDialog = new LoginDialog;
         MainWindow w;
+        QObject::connect(loginDialog, SIGNAL(sendAccess(QString,QString)),&w, SLOT(on_sendAccess(QString,QString)));
 
         loginDialog->setWindowFlags(((loginDialog->windowFlags() | Qt::CustomizeWindowHint) & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint));
 
