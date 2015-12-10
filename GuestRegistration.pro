@@ -4,17 +4,24 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = GuestRegistration
 TEMPLATE = app
-
+RC_ICON = icon.ico
+CONFIG += debug
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    logindialog.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    logindialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    logindialog.ui
+
+RESOURCES += \
+    resources.qrc

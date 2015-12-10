@@ -12,3 +12,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    qDebug() << "Performing application reboot...";
+    qApp->exit( MainWindow::EXIT_CODE_REBOOT );
+}
