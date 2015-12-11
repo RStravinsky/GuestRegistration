@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->logoutButton->installEventFilter(this);
     ui->helpButton->installEventFilter(this);
     ui->generateButton->installEventFilter(this);
+    ui->tableView->installEventFilter(this);
     connect(this,SIGNAL(mainButtonReleased(const QPushButton*)),this,SLOT(on_mainButtonReleased(const QPushButton*)));
 }
 
@@ -20,14 +21,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//QTableView *createView(const QString &title, QSqlTableModel *model)
-//{
-//    QTableView *view = new QTableView;
-//    view->setModel(model);
-//    view->setItemDelegate(new QSqlRelationalDelegate(view));
-//    view->setWindowTitle(title);
-//    return view;
-//}
+void MainWindow::loadSqlModel()
+{
+    sqlModel = new QSqlTableModel(this);
+    sqlModel->setTable("registration");
+    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    sqlModel->select();
+    ui->tableView->setModel(sqlModel);
+    ui->tableView->show();
+    sqlModel->insertRow(sqlModel->rowCount());
+
+    configureTable();
+}
+
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
@@ -56,8 +62,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
-
-
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
     if(event->type() == QEvent::Resize) {
@@ -65,7 +69,6 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         if(this->height()>1080) this->setMaximumHeight(1080);
     }
 }
-
 
 void MainWindow::on_sendAccess(QString login,QString password)
 {
@@ -91,6 +94,7 @@ void MainWindow::addStatusBar()
     Statprogress = new QProgressBar(this);
     Statlabel = new QLabel(this);
     Statlabel->setFont(Status_Font);
+    Statlabel->setStyleSheet("background: transparent");
     Statprogress->setStyleSheet("QProgressBar {border: 2px solid rgb(20,20,20); border-radius: 5px;background: rgb(20,20,20);min-height: 20px}"
     "QProgressBar::chunk {background: #088E8C ;border-radius: 4px;}");
     Statprogress->setTextVisible(false);
@@ -101,14 +105,38 @@ void MainWindow::addStatusBar()
                                  "stop: 0 rgba(35,35,35), stop: 0.7 rgb(80,80,80));;min-height: 30px}");
 }
 
-void MainWindow::loadSqlModel()
+void MainWindow::configureTable()
 {
-    sqlModel = new QSqlTableModel(this);
-    sqlModel->setTable("registration");
-    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    sqlModel->select();
-    qDebug() << sqlModel->lastError().text();
-    ui->tableView->setModel(sqlModel);
-    ui->tableView->show();
+    QFont Font("Calibri Light", 14, QFont::Light ,false);
+
+    ui->tableView->horizontalHeader()->setVisible(true);
+    ui->tableView->verticalHeader()->setFixedWidth(30);
+    ui->tableView->horizontalHeader()->setFixedHeight(30);
+    ui->tableView->hideColumn(0);
+    QStringList headerList ({"Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przykazdu", "Czas wyjazdu"});
+    for(int i=1; i<sqlModel->columnCount(); ++i) {
+        ui->tableView->setColumnWidth(i,266);
+        sqlModel->setHeaderData(i, Qt::Horizontal, headerList.at(i-1));
+    };
+
+    ui->tableView->horizontalHeader()->setFont(Font);
+    ui->tableView->setFont(Font);
 }
 
+
+void MainWindow::on_addButton_clicked()
+{
+    static bool isSubmit = false;
+    ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
+    ui->addButton->setStyleSheet("QPushButton {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
+                                "QPushButton:hover {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
+                                "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
+    isSubmit = !isSubmit;
+
+}
+
+void MainWindow::on_deleteButton_clicked()
+{
+
+}

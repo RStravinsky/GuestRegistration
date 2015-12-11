@@ -8,5 +8,8 @@
         <file>images/logout.png</file>
         <file>images/help.png</file>
         <file>images/magnifier.png</file>
+        <file>images/add_person.png</file>
+        <file>images/delete_person.png</file>
+        <file>images/submit.png</file>
     </qresource>
 </RCC>

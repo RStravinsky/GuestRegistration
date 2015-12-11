@@ -12,6 +12,7 @@ TARGET = GuestRegistration
 TEMPLATE = app
 RC_ICON = icon.ico
 CONFIG += debug
+CONFIG += c++11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
