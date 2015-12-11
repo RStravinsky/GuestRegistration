@@ -29,7 +29,6 @@ void MainWindow::loadSqlModel()
     sqlModel->select();
     ui->tableView->setModel(sqlModel);
     ui->tableView->show();
-    sqlModel->insertRow(sqlModel->rowCount());
 
     configureTable();
 }
@@ -113,7 +112,7 @@ void MainWindow::configureTable()
     ui->tableView->verticalHeader()->setFixedWidth(30);
     ui->tableView->horizontalHeader()->setFixedHeight(30);
     ui->tableView->hideColumn(0);
-    QStringList headerList ({"Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przykazdu", "Czas wyjazdu"});
+    QStringList headerList ({"Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
     for(int i=1; i<sqlModel->columnCount(); ++i) {
         ui->tableView->setColumnWidth(i,266);
         sqlModel->setHeaderData(i, Qt::Horizontal, headerList.at(i-1));
@@ -127,16 +126,63 @@ void MainWindow::configureTable()
 void MainWindow::on_addButton_clicked()
 {
     static bool isSubmit = false;
-    ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
-    ui->addButton->setStyleSheet("QPushButton {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
-                                "QPushButton:hover {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
-                                "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
-    isSubmit = !isSubmit;
+    if(!isSubmit) {
+        ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
+        ui->addButton->setStyleSheet("QPushButton {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
+                                    "QPushButton:hover {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
+                                    "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                    "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
+        isSubmit = !isSubmit;
+        ui->tableView->scrollToBottom();
+        sqlModel->insertRow(sqlModel->rowCount());
+    }
+    else {
+        ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
+        ui->addButton->setStyleSheet("QPushButton {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
+                                    "QPushButton:hover {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
+                                    "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                    "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
+        isSubmit = !isSubmit;
+        submit(sqlModel);
+    }
+
+
+}
+
+void MainWindow::submit(QSqlTableModel *&model)
+{
+    if(!model->submitAll())
+    {
+        QMessageBox::warning(this,"BŁĄD",model->lastError().text());
+        model->select();
+    }
+    else
+        QMessageBox::information(this,"Informacja","Dodano.");
 
 }
 
 void MainWindow::on_deleteButton_clicked()
 {
+    QModelIndexList indexes = ui->tableView->selectionModel()->selectedRows();
+    if (!indexes.isEmpty()) {
+        QSqlQuery query;
+        query.prepare("call guestregistration.fillDepartureTime(:id)");
+        qDebug() << ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt();
+        query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
+        if(!query.exec())
+            QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
+        sqlModel->select();
+    }
 
+    else
+        QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
+}
+
+
+void MainWindow::on_tableView_clicked(const QModelIndex &index)
+{
+    Q_UNUSED(index)
+    QString headerName=ui->tableView->model()->headerData(ui->tableView->currentIndex().column(), Qt::Horizontal).toString();
+    if(headerName.contains("Czas przyjazdu") || headerName.contains("Czas wyjazdu"))
+        QMessageBox::information(this,QString("Informacja"),QString("Pole uzupełniane jest automatycznie."));
 }

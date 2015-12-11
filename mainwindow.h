@@ -12,6 +12,7 @@
 #include <QSqlTableModel>
 #include <QSqlError>
 #include <QSortFilterProxyModel>
+#include <QSqlQuery>
 #include "logindialog.h"
 
 namespace Ui {
@@ -31,10 +32,9 @@ public:
 private slots:
     void on_sendAccess(QString login,QString password);
     void on_mainButtonReleased(const QPushButton * mainButton);
-
     void on_addButton_clicked();
-
     void on_deleteButton_clicked();
+    void on_tableView_clicked(const QModelIndex &index);
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
@@ -51,6 +51,7 @@ private:
     void resizeEvent(QResizeEvent* event);
     void addStatusBar();
     void configureTable();
+    void submit(QSqlTableModel *&model);
 };
 
 #endif // MAINWINDOW_H
