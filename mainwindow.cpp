@@ -11,17 +11,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->helpButton->installEventFilter(this);
     ui->generateButton->installEventFilter(this);
     connect(this,SIGNAL(mainButtonReleased(const QPushButton*)),this,SLOT(on_mainButtonReleased(const QPushButton*)));
-
-    sqlModel = new QSqlTableModel(this);
-    sqlModel->setTable("registration");
-    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    sqlModel->select();
-    ui->tableView->setModel(sqlModel);
-    ui->tableView->show();
 }
 
 MainWindow::~MainWindow()
 {
+    LoginDialog loginDialog;
+    loginDialog.closeDatabase();
     delete ui;
 }
 
@@ -103,6 +98,17 @@ void MainWindow::addStatusBar()
     ui->statusBar->addPermanentWidget(Statprogress,1);
     ui->statusBar->setFont(Status_Font);
     ui->statusBar->setStyleSheet("QStatusBar {background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-    "stop: 0 rgba(35,35,35), stop: 0.7 rgb(80,80,80));;min-height: 30px}");
+                                 "stop: 0 rgba(35,35,35), stop: 0.7 rgb(80,80,80));;min-height: 30px}");
+}
+
+void MainWindow::loadSqlModel()
+{
+    sqlModel = new QSqlTableModel(this);
+    sqlModel->setTable("registration");
+    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    sqlModel->select();
+    qDebug() << sqlModel->lastError().text();
+    ui->tableView->setModel(sqlModel);
+    ui->tableView->show();
 }
 

@@ -32,12 +32,7 @@ bool LoginDialog::connectToDatabase(QString &login,QString &password)
 
 void LoginDialog::closeDatabase(){
     sqlDatabase.close();
-    QSqlDatabase::removeDatabase("GuestRegistration");
-}
-
-QSqlDatabase &LoginDialog::getDatabase()
-{
-    return sqlDatabase;
+    QSqlDatabase::removeDatabase("guestregistration");
 }
 
 void LoginDialog::on_loginButton_clicked()

@@ -19,6 +19,8 @@ class LoginDialog : public QDialog
 public:
     explicit LoginDialog(QWidget *parent = 0);
     ~LoginDialog();
+    QSqlDatabase sqlDatabase;
+    void closeDatabase();
 
 private slots:
     void on_loginButton_clicked();
@@ -28,11 +30,8 @@ signals:
 
 private:
     Ui::LoginDialog *ui;
-    QSqlDatabase sqlDatabase;
     bool eventFilter(QObject *obj, QEvent *event);
     bool connectToDatabase(QString &login,QString &password);
-    void closeDatabase();
-    QSqlDatabase & getDatabase();
 };
 
 #endif // LOGINDIALOG_H

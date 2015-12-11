@@ -9,6 +9,7 @@
 #include <QResizeEvent>
 #include <QEvent>
 #include <QSqlTableModel>
+#include <QSqlError>
 #include <QSortFilterProxyModel>
 #include "logindialog.h"
 
@@ -24,7 +25,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     static int const EXIT_CODE_REBOOT=-123456789;
-    friend QSqlDatabase &getDatabase();
+    void loadSqlModel();
 
 private slots:
     void on_sendAccess(QString login,QString password);
@@ -45,6 +46,7 @@ private:
     void resizeEvent(QResizeEvent* event);
 
     void addStatusBar();
+
 };
 
 #endif // MAINWINDOW_H

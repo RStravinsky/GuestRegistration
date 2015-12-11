@@ -9,10 +9,9 @@ int main(int argc, char *argv[])
     do {
         QApplication a(argc, argv);
         LoginDialog *loginDialog = new LoginDialog;
+        loginDialog->setWindowFlags(((loginDialog->windowFlags() | Qt::CustomizeWindowHint) & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint));
         MainWindow w;
         QObject::connect(loginDialog, SIGNAL(sendAccess(QString,QString)),&w, SLOT(on_sendAccess(QString,QString)));
-
-        loginDialog->setWindowFlags(((loginDialog->windowFlags() | Qt::CustomizeWindowHint) & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint));
 
         if (loginDialog->exec() != QDialog::Accepted) {
             a.quit();
@@ -21,6 +20,7 @@ int main(int argc, char *argv[])
         else {
             delete loginDialog;
             w.showMaximized();
+            w.loadSqlModel();
             w.show();
         }
         currentExitCode = a.exec();
