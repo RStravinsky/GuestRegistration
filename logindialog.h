@@ -32,6 +32,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
     bool connectToDatabase(QString &login,QString &password);
     void closeDatabase();
+    QSqlDatabase & getDatabase();
 };
 
 #endif // LOGINDIALOG_H

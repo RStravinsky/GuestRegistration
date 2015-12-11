@@ -8,6 +8,9 @@
 #include <QProgressBar>
 #include <QResizeEvent>
 #include <QEvent>
+#include <QSqlTableModel>
+#include <QSortFilterProxyModel>
+#include "logindialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +24,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     static int const EXIT_CODE_REBOOT=-123456789;
+    friend QSqlDatabase &getDatabase();
 
 private slots:
     void on_sendAccess(QString login,QString password);
@@ -34,6 +38,8 @@ private:
     bool readOnly;
     QLabel * Statlabel;
     QProgressBar *Statprogress;
+    QSqlTableModel * sqlModel;
+    QSortFilterProxyModel * proxyModel;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent* event);

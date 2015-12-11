@@ -1,12 +1,12 @@
 <RCC>
     <qresource prefix="/images">
         <file>images/frameLabel.png</file>
-        <file>images/sigma.png</file>
         <file>images/icon.ico</file>
         <file>images/loginIcon.ico</file>
-        <file>images/help.png</file>
-        <file>images/logout.png</file>
-        <file>images/print.png</file>
         <file>images/save.png</file>
+        <file>images/sigma.png</file>
+        <file>images/logout.png</file>
+        <file>images/help.png</file>
+        <file>images/magnifier.png</file>
     </qresource>
 </RCC>

@@ -35,6 +35,11 @@ void LoginDialog::closeDatabase(){
     QSqlDatabase::removeDatabase("GuestRegistration");
 }
 
+QSqlDatabase &LoginDialog::getDatabase()
+{
+    return sqlDatabase;
+}
+
 void LoginDialog::on_loginButton_clicked()
 {
     QString username=ui->userLineEdit->text();

@@ -30,9 +30,23 @@
    <property name="styleSheet">
     <string notr="true">#centralWidget {
     background-color: black;
-}</string>
+}
+
+#centralWidget QLineEdit {
+color: gray;
+border: 2px solid lightgray;
+border-radius: 5px;
+}
+
+#centralWidget QLineEdit:focus {
+color: gray;
+border: 3px solid rgb(8,142,140);
+border-radius: 5px;
+}
+
+</string>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="1,5,0" columnstretch="0,1,0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0" columnstretch="0,0,1,0,0">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -42,10 +56,99 @@
     <property name="rightMargin">
      <number>0</number>
     </property>
-    <property name="bottomMargin">
-     <number>9</number>
-    </property>
-    <item row="0" column="0" colspan="3">
+    <item row="1" column="1">
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>38</width>
+        <height>38</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>41</width>
+        <height>38</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/images/images/magnifier.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <spacer name="rightSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>1</width>
+        <height>1</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="3" column="0">
+     <spacer name="leftSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>1</width>
+        <height>1</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="3" column="1" rowspan="2" colspan="3">
+     <widget class="QTableView" name="tableView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QTableView {
+    background-color: rgb(35,35,35);
+    color:#fffff8;
+    gridline-color: #fffff8;
+   /* font-size: 12pt;*/
+	border: 2px solid rgb(20,20,20);
+	border-radius: 11px;
+	padding: 5px;
+}
+
+ QTableView QTableCornerButton::section {
+    background-color: #646464;
+    border: 1px solid #fffff8;
+}</string>
+      </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>29</number>
+      </attribute>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="5">
      <widget class="QFrame" name="topFrame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -63,7 +166,31 @@
        <string notr="true">#topFrame {
 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
    stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
-}</string>
+}
+
+
+#topFrame QPushButton {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+#topFrame QPushButton:hover {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+#topFrame QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}
+</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -74,10 +201,10 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
       <widget class="QPushButton" name="generateButton">
        <property name="geometry">
         <rect>
-         <x>280</x>
-         <y>0</y>
-         <width>150</width>
-         <height>141</height>
+         <x>270</x>
+         <y>20</y>
+         <width>121</width>
+         <height>111</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -93,7 +220,7 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">border: none;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string/>
@@ -109,45 +236,13 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         </size>
        </property>
       </widget>
-      <widget class="QPushButton" name="printButton">
-       <property name="geometry">
-        <rect>
-         <x>460</x>
-         <y>0</y>
-         <width>150</width>
-         <height>141</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: none;</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="resources.qrc">
-         <normaloff>:/images/images/print.png</normaloff>:/images/images/print.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>90</width>
-         <height>90</height>
-        </size>
-       </property>
-      </widget>
       <widget class="QPushButton" name="helpButton">
        <property name="geometry">
         <rect>
-         <x>630</x>
-         <y>0</y>
-         <width>150</width>
-         <height>141</height>
+         <x>410</x>
+         <y>20</y>
+         <width>121</width>
+         <height>111</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -157,7 +252,7 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         </sizepolicy>
        </property>
        <property name="styleSheet">
-        <string notr="true">border: none;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string/>
@@ -176,10 +271,10 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
       <widget class="QPushButton" name="logoutButton">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>0</y>
-         <width>150</width>
-         <height>140</height>
+         <x>550</x>
+         <y>20</y>
+         <width>121</width>
+         <height>111</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -189,7 +284,7 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         </sizepolicy>
        </property>
        <property name="styleSheet">
-        <string notr="true">border: none;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string/>
@@ -226,66 +321,32 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
       </widget>
      </widget>
     </item>
-    <item row="1" column="0">
-     <spacer name="leftSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
+    <item row="1" column="2">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="minimumSize">
        <size>
-        <width>1</width>
-        <height>1</height>
+        <width>0</width>
+        <height>40</height>
        </size>
       </property>
-     </spacer>
-    </item>
-    <item row="1" column="1" rowspan="2">
-     <widget class="QTableView" name="tableView">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
       </property>
-      <property name="styleSheet">
-       <string notr="true">QTableView {
-    background-color: #333333;
-    color:#fffff8;
-    gridline-color: #fffff8;
-   /* font-size: 12pt;*/
-	border: 2px solid rgb(20,20,20);
-	border-radius: 11px;
-	padding: 5px;
-}
-
- QTableView QTableCornerButton::section {
-    background-color: #646464;
-    border: 1px solid #fffff8;
-}</string>
+      <property name="font">
+       <font>
+        <family>Calibri Light</family>
+        <pointsize>16</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
-      <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>29</number>
-      </attribute>
+      <property name="placeholderText">
+       <string>Szybkie wyszukiwanie</string>
+      </property>
      </widget>
-    </item>
-    <item row="2" column="2">
-     <spacer name="rightSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>1</width>
-        <height>1</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>
