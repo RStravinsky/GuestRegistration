@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network
+QT       += core gui sql network printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,10 +16,12 @@ CONFIG += c++11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    logindialog.cpp
+    logindialog.cpp \
+    modsqltablemodel.cpp
 
 HEADERS  += mainwindow.h \
-    logindialog.h
+    logindialog.h \
+    modsqltablemodel.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui
