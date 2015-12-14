@@ -13,6 +13,8 @@
 #include <QSqlError>
 #include <QSortFilterProxyModel>
 #include <QSqlQuery>
+#include <QTimer>
+#include <QtNetwork/QNetworkInterface>
 #include "logindialog.h"
 
 namespace Ui {
@@ -35,23 +37,27 @@ private slots:
     void on_addButton_clicked();
     void on_deleteButton_clicked();
     void on_tableView_clicked(const QModelIndex &index);
+    void on_timer_overflow();
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
 
 private:
     Ui::MainWindow *ui;
-    bool readOnly;
+    bool isAdded{false};
     QLabel * Statlabel;
     QProgressBar *Statprogress;
     QSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
+    QTimer *timer;
+    bool isConnectedToNetwork();
+
 
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent* event);
     void addStatusBar();
     void configureTable();
-    void submit(QSqlTableModel *&model);
+    bool submit(QSqlTableModel *&model);
 };
 
 #endif // MAINWINDOW_H

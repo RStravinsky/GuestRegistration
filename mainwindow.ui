@@ -20,11 +20,19 @@
    <string>Ewidencja gości</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/images/images/icon.ico</normaloff>:/images/images/icon.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(35,35,35);
+   <string notr="true">#MainWindow {background-color: rgb(35,35,35);}
+
+
+
+
+
+
+
+
 
 </string>
   </property>
@@ -45,6 +53,7 @@ border-radius: 5px;
 color: gray;
 border: 3px solid rgb(8,142,140);
 border-radius: 5px;
+font-size:16pt
 }
 
 #centralWidget QTableView {
@@ -70,6 +79,16 @@ border-radius: 5px;
      color: white    
 ;}
 
+QMessageBox  {
+color: white;
+border: 2px solid #555;
+background: qradialgradient(cx: 0.3, cy: -0.4,
+fx: 0.3, fy: -0.4,
+radius: 1.35, stop: 0 #fff, stop: 1 #888);
+}
+
+
+
 
 </string>
    </property>
@@ -93,6 +112,12 @@ border-radius: 5px;
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>16</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
@@ -229,7 +254,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="resources.qrc">
+        <iconset>
          <normaloff>:/images/images/save.png</normaloff>:/images/images/save.png</iconset>
        </property>
        <property name="iconSize">
@@ -261,7 +286,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="resources.qrc">
+        <iconset>
          <normaloff>:/images/images/help.png</normaloff>:/images/images/help.png</iconset>
        </property>
        <property name="iconSize">
@@ -293,7 +318,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="resources.qrc">
+        <iconset>
          <normaloff>:/images/images/logout.png</normaloff>:/images/images/logout.png</iconset>
        </property>
        <property name="iconSize">
@@ -319,7 +344,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="resources.qrc">:/images/images/sigma.png</pixmap>
+        <pixmap>:/images/images/sigma.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -354,7 +379,7 @@ background: rgb(80,80,80);
        <string/>
       </property>
       <property name="pixmap">
-       <pixmap resource="resources.qrc">:/images/images/magnifier.png</pixmap>
+       <pixmap>:/images/images/magnifier.png</pixmap>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
@@ -409,7 +434,7 @@ background: rgb(80,80,80);
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resources.qrc">
+       <iconset>
         <normaloff>:/images/images/add_person.png</normaloff>:/images/images/add_person.png</iconset>
       </property>
       <property name="iconSize">
@@ -468,7 +493,7 @@ background: rgb(80,80,80);
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resources.qrc">
+       <iconset>
         <normaloff>:/images/images/delete_person.png</normaloff>:/images/images/delete_person.png</iconset>
       </property>
       <property name="iconSize">
@@ -484,8 +509,6 @@ background: rgb(80,80,80);
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
