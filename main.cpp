@@ -2,12 +2,18 @@
 #include <QApplication>
 #include <logindialog.h>
 
+double dpiPercent;
+
 int main(int argc, char *argv[])
 {
     int currentExitCode = 0;
 
     do {
         QApplication a(argc, argv);
+
+        int dpiX = qApp->desktop()->logicalDpiX();
+        dpiPercent = ((100*dpiX)/96);
+
         LoginDialog *loginDialog = new LoginDialog;
         loginDialog->setWindowFlags(((loginDialog->windowFlags() | Qt::CustomizeWindowHint) & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint));
         MainWindow w;

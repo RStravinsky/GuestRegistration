@@ -13,7 +13,10 @@
 #include <QSqlError>
 #include <QSortFilterProxyModel>
 #include <QSqlQuery>
+#include <QPainter>
+#include <QtPrintSupport>
 #include "logindialog.h"
+#include "modsqltablemodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -29,12 +32,12 @@ public:
     static int const EXIT_CODE_REBOOT=-123456789;
     void loadSqlModel();
 
+
 private slots:
     void on_sendAccess(QString login,QString password);
     void on_mainButtonReleased(const QPushButton * mainButton);
     void on_addButton_clicked();
     void on_deleteButton_clicked();
-    void on_tableView_clicked(const QModelIndex &index);
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
@@ -44,14 +47,16 @@ private:
     bool readOnly;
     QLabel * Statlabel;
     QProgressBar *Statprogress;
-    QSqlTableModel * sqlModel;
+    ModSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent* event);
     void addStatusBar();
     void configureTable();
-    void submit(QSqlTableModel *&model);
+    void submit(ModSqlTableModel *&model);
+    void exportToPDF();
+    QPixmap grabTable();
 };
 
 #endif // MAINWINDOW_H
