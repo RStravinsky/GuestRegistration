@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>476</width>
-    <height>431</height>
+    <height>345</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,28 +22,6 @@
 	background: black;
 }
 
-#LoginDialog QPushButton {
-color: gray;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(35,35,35);
-}
-
-#LoginDialog QPushButton:hover {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
-}
-
-#LoginDialog QPushButton:pressed {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(80,80,80);
-}
-
 #LoginDialog QLineEdit {
 color: gray;
 border: 2px solid lightgray;
@@ -55,6 +33,8 @@ color: gray;
 border: 3px solid rgb(8,142,140);
 border-radius: 5px;
 }
+
+
 
 </string>
   </property>
@@ -188,6 +168,29 @@ border-radius: 5px;
    <property name="focusPolicy">
     <enum>Qt::NoFocus</enum>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+QPushButton:hover {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}</string>
+   </property>
    <property name="text">
     <string>Anuluj</string>
    </property>
@@ -195,7 +198,7 @@ border-radius: 5px;
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="getPasswordButton">
+  <widget class="QPushButton" name="loginButton">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -215,32 +218,59 @@ border-radius: 5px;
    <property name="focusPolicy">
     <enum>Qt::NoFocus</enum>
    </property>
-   <property name="text">
-    <string>Zapomniałeś hasła</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="loginButton">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>300</y>
-     <width>435</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Calibri Light</family>
-     <pointsize>16</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::NoFocus</enum>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+QPushButton:hover {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}</string>
    </property>
    <property name="text">
     <string>Zaloguj</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>404</x>
+     <y>180</y>
+     <width>41</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: none;
+
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/images/eye.png</normaloff>:/images/images/eye.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>42</width>
+     <height>42</height>
+    </size>
    </property>
   </widget>
  </widget>

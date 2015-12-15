@@ -17,6 +17,8 @@
 #include <QtNetwork/QNetworkInterface>
 #include <QPainter>
 #include <QtPrintSupport>
+#include <QHeaderView>
+#include <qspreadsheetheaderview.h>
 #include "logindialog.h"
 #include "modsqltablemodel.h"
 
@@ -34,13 +36,13 @@ public:
     static int const EXIT_CODE_REBOOT=-123456789;
     void loadSqlModel();
 
-
 private slots:
     void on_sendAccess(QString login,QString password);
     void on_mainButtonReleased(const QPushButton * mainButton);
     void on_addButton_clicked();
     void on_deleteButton_clicked();
     void on_timer_overflow();
+    void on_lineEdit_textChanged(const QString &arg1);
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
@@ -60,8 +62,7 @@ private:
     void addStatusBar();
     void configureTable();
     bool submit(ModSqlTableModel *&model);
-    void exportToPDF();
-    QPixmap grabTable();
+    bool dataIsCorrect();
 };
 
 #endif // MAINWINDOW_H

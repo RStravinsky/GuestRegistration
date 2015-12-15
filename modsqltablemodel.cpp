@@ -19,3 +19,13 @@ Qt::ItemFlags ModSqlTableModel::flags(const QModelIndex &index) const
     }
 
 }
+
+QVariant ModSqlTableModel::data(const QModelIndex &idx, int role) const
+{
+    QVariant v = QSqlTableModel::data(idx, role);
+
+    if ((role == Qt::BackgroundRole) && (index(idx.row(), 7, idx.parent()).data().toString().isEmpty()))
+        return QVariant(QColor(8,142,140));
+
+    return (v);
+}

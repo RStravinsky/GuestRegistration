@@ -17,14 +17,19 @@ CONFIG += c++11
 SOURCES += main.cpp\
         mainwindow.cpp \
     logindialog.cpp \
-    modsqltablemodel.cpp
+    modsqltablemodel.cpp \
+    qspreadsheetheaderview.cpp \
+    exportdialog.cpp
 
 HEADERS  += mainwindow.h \
     logindialog.h \
-    modsqltablemodel.h
+    modsqltablemodel.h \
+    qspreadsheetheaderview.h \
+    exportdialog.h
 
 FORMS    += mainwindow.ui \
-    logindialog.ui
+    logindialog.ui \
+    exportdialog.ui
 
 RESOURCES += \
     resources.qrc

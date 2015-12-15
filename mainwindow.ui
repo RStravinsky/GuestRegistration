@@ -20,21 +20,11 @@
    <string>Ewidencja gości</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="resources.qrc">
     <normaloff>:/images/images/icon.ico</normaloff>:/images/images/icon.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">#MainWindow {background-color: rgb(35,35,35);}
-
-
-
-
-
-
-
-
-
-</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
@@ -70,21 +60,38 @@ font-size:16pt
     border: 1px solid #fffff8;
 }
 
+#centralWidget QHeaderView {
+    background-color: rgb(35,35,35);
+}
+
 #centralWidget QHeaderView::section {
     background-color: rgb(100,100,100);
     padding: 4px;
     border: 1px solid #fffff8;
     font-family: Calibri Light;
     font: 16px;
-     color: white    
-;}
+    color: white;
+}
 
-QMessageBox  {
-color: white;
-border: 2px solid #555;
-background: qradialgradient(cx: 0.3, cy: -0.4,
-fx: 0.3, fy: -0.4,
-radius: 1.35, stop: 0 #fff, stop: 1 #888);
+QMenu {
+     background-color: rgb(100,100,100);
+     color: white;
+     font-family: Arial;
+     font-size: 12px;  
+     font-weight: bold ;
+     border-radius: 2px;
+     border: 1px solid white;
+}
+
+QMenu::item{
+     padding-top: 4px;
+     padding-left: 5px;
+     padding-right: 15px;
+     padding-bottom: 4px;
+}
+
+QMenu::item:selected {
+    background: rgb(8,142,140);
 }
 
 
@@ -154,6 +161,9 @@ radius: 1.35, stop: 0 #fff, stop: 1 #888);
       </property>
       <property name="placeholderText">
        <string>Szybkie wyszukiwanie</string>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -254,7 +264,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="resources.qrc">
          <normaloff>:/images/images/save.png</normaloff>:/images/images/save.png</iconset>
        </property>
        <property name="iconSize">
@@ -286,7 +296,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="resources.qrc">
          <normaloff>:/images/images/help.png</normaloff>:/images/images/help.png</iconset>
        </property>
        <property name="iconSize">
@@ -318,7 +328,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="resources.qrc">
          <normaloff>:/images/images/logout.png</normaloff>:/images/images/logout.png</iconset>
        </property>
        <property name="iconSize">
@@ -344,7 +354,7 @@ background: rgb(80,80,80);
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>:/images/images/sigma.png</pixmap>
+        <pixmap resource="resources.qrc">:/images/images/sigma.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -353,7 +363,7 @@ background: rgb(80,80,80);
      </widget>
     </item>
     <item row="1" column="6">
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="searchLabel">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -379,7 +389,7 @@ background: rgb(80,80,80);
        <string/>
       </property>
       <property name="pixmap">
-       <pixmap>:/images/images/magnifier.png</pixmap>
+       <pixmap resource="resources.qrc">:/images/images/magnifier.png</pixmap>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
@@ -405,6 +415,9 @@ background: rgb(80,80,80);
         <width>50</width>
         <height>50</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>Przyjazd osoby</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton {
@@ -434,7 +447,7 @@ background: rgb(80,80,80);
        <string/>
       </property>
       <property name="icon">
-       <iconset>
+       <iconset resource="resources.qrc">
         <normaloff>:/images/images/add_person.png</normaloff>:/images/images/add_person.png</iconset>
       </property>
       <property name="iconSize">
@@ -465,6 +478,9 @@ background: rgb(80,80,80);
         <height>50</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string>Odjazd osoby</string>
+      </property>
       <property name="styleSheet">
        <string notr="true">QPushButton {
 color: gray;
@@ -493,7 +509,7 @@ background: rgb(80,80,80);
        <string/>
       </property>
       <property name="icon">
-       <iconset>
+       <iconset resource="resources.qrc">
         <normaloff>:/images/images/delete_person.png</normaloff>:/images/images/delete_person.png</iconset>
       </property>
       <property name="iconSize">
@@ -509,6 +525,8 @@ background: rgb(80,80,80);
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

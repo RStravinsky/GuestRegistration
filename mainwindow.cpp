@@ -45,14 +45,21 @@ bool MainWindow::isConnectedToNetwork(){
     return result;
 }
 
-
 void MainWindow::loadSqlModel()
 {
     sqlModel = new ModSqlTableModel(this);
     sqlModel->setTable("registration");
+    sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 10 DAY) And CURDATE()+1");
+    sqlModel->sort(6,Qt::AscendingOrder);
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    sqlModel->select();    
-    ui->tableView->setModel(sqlModel);
+    sqlModel->select();
+
+    proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setSourceModel(sqlModel);
+    ui->tableView->setModel(proxyModel);
+
+    QSpreadsheetHeaderView * header = new QSpreadsheetHeaderView(Qt::Horizontal,this);
+    ui->tableView->setHorizontalHeader(header);
     ui->tableView->show();
 
     configureTable();
@@ -110,7 +117,7 @@ void MainWindow::on_sendAccess(QString login,QString password)
        ui->deleteButton->setVisible(false);
        ui->line->setVisible(false);
    }
-   Statlabel->setText("<font color='white'>Połączono z użytkownikiem: <font color='green'>"+login+"</font></font>");
+   Statlabel->setText("<font color='white'>Połączono z użytkownikiem: <b><font color='green'>"+login+"</font></b></font>");
 }
 
 void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
@@ -118,8 +125,28 @@ void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
     if( mainButton == ui->logoutButton )
         qApp->exit( MainWindow::EXIT_CODE_REBOOT );
 
-    if( mainButton == ui->generateButton )
-        exportToPDF();
+    if( mainButton == ui->generateButton ) {
+        ExportDialog exportDialog(sqlModel,this);
+        exportDialog.exec();
+    }
+        //exportToPDF();
+}
+
+void MainWindow::on_timer_overflow()
+{
+    if(!isConnectedToNetwork()) {
+        QMessageBox::critical(this,QString("Błąd"),QString("Połaczenie z bazą danych zostało przerwane!\nNastąpi przejście do okna logowania."));
+        qApp->exit( MainWindow::EXIT_CODE_REBOOT );
+    }
+    timer->start(5000);
+}
+
+void MainWindow::on_lineEdit_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    proxyModel->setFilterKeyColumn(-1);
+    QRegExp regExp(ui->lineEdit->text(), Qt::CaseInsensitive, QRegExp::Wildcard);
+    proxyModel->setFilterRegExp(regExp);
 }
 
 void MainWindow::addStatusBar()
@@ -172,7 +199,7 @@ void MainWindow::on_addButton_clicked()
                                         "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
         }
         else
-            QMessageBox::warning(this,"Informacja","Nie dodano osoby.");
+            QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: Nie można dodać nowego wiersza.");
     }
     else {
         if(submit(sqlModel)) {
@@ -189,15 +216,20 @@ void MainWindow::on_addButton_clicked()
 
 bool MainWindow::submit(ModSqlTableModel *&model)
 {
-    if(!model->submitAll()) {
-        QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPowód: "+model->lastError().text()+"");
+    if(dataIsCorrect()) {
+        if(!model->submitAll()) {
+            QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: "+model->lastError().text()+"");
+            return false;
+        }
+        else {
+            QMessageBox::information(this,"Informacja","Dodano osobę.");
+            model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 10 DAY) And CURDATE()+1");
+            model->select();
+            return true;
+        }
+    }
+    else
         return false;
-    }
-    else {
-        QMessageBox::information(this,"Informacja","Dodano osobę.");
-        model->select();
-        return true;
-    }
 }
 
 void MainWindow::on_deleteButton_clicked()
@@ -205,14 +237,19 @@ void MainWindow::on_deleteButton_clicked()
     if(!isAdded) {
         QModelIndexList indexes = ui->tableView->selectionModel()->selectedRows();
         if (!indexes.isEmpty()) {
-            QSqlQuery query;
-            query.prepare("call guestregistration.fillDepartureTime(:id)");
-            query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
-            if(!query.exec()) {
-                QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
-                return;
+            if(ui->tableView->model()->index(ui->tableView->currentIndex().row(),7).data().toString().isEmpty()) {
+                QSqlQuery query;
+                query.prepare("call guestregistration.fillDepartureTime(:id)");
+                query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
+                if(!query.exec()) {
+                    QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
+                    return;
+                }
+                sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 10 DAY) And CURDATE()+1");
+                sqlModel->select();
             }
-            sqlModel->select();
+            else
+                QMessageBox::information(this,QString("Informacja"),QString("Osoba już wyszła."));
         }
         else
             QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
@@ -221,143 +258,21 @@ void MainWindow::on_deleteButton_clicked()
         QMessageBox::information(this,QString("Informacja"),QString("Nie można usunąć przed zatwierdzeniem."));
 }
 
-QPixmap MainWindow::grabTable()
+bool MainWindow::dataIsCorrect()
 {
-    const int rows = ui -> tableView -> model() -> rowCount();
-    const int columns = ui -> tableView -> model() -> columnCount();
+    QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
+    QString surename = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
 
-    double totalWidth = ui -> tableView -> verticalHeader() -> width();
-    for ( int c = 0; c < columns; ++c )
-        totalWidth += ui -> tableView -> columnWidth(c);
-
-    double totalHeight = ui -> tableView -> horizontalHeader() -> height();
-    for ( int r = 0; r < rows; ++r )
-        totalHeight += ui -> tableView -> rowHeight(r);
-
-    QTableView tempTable( ui->tableView );
-    tempTable.setFixedHeight( totalHeight );
-    tempTable.setModel( ui -> tableView -> model() );
-    tempTable.setFixedSize( totalWidth, totalHeight );
-    tempTable.setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    tempTable.setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    tempTable.verticalHeader() -> hide();
-    tempTable.horizontalHeader()->setStyleSheet("font: 22px;");
-
-
-    for ( int i = 0; i < ui -> tableView -> model() -> columnCount() ; ++i )
-        tempTable.setColumnWidth( i, ui -> tableView -> columnWidth(0) );
-    tempTable.horizontalHeader() -> setStretchLastSection( true );
-
-    QPixmap grabPixmap = QPixmap::grabWidget( &tempTable );
-    return grabPixmap;
-
-}
-
-void MainWindow::exportToPDF()
-{
-    QPrinter printer( QPrinter::HighResolution );
-    QString pdfFile;
-    QString filters( "Pliki PDF (*.pdf);;Wszystkie pliki (*.*)" );
-    QString pdfFilter( "Pliki PDF (*.pdf)" );
-
-    pdfFile = QFileDialog::getSaveFileName( this, "Wyeksportuj do pliku", QDir::homePath(), filters, &pdfFilter );
-
-    if (pdfFile.isEmpty()) return;
-
-    printer.setOutputFileName( pdfFile );
-    printer.setOutputFormat( QPrinter::PdfFormat );
-    printer.setFullPage( true );
-    printer.setPageMargins( 15, 0, 15, 0, QPrinter::Millimeter );
-
-
-    QPainter painter( &printer );
-    painter.scale( 8, 8 );
-
-    QPixmap pixmap = grabTable();
-
-    QRectF sourceRect;
-    double totalPageHeight = ui -> tableView -> horizontalHeader() -> height();
-    int columnCount = 0;
-    int rowCount = 0;
-    int pageCount = 1;
-
-    QFont headerFont;
-    headerFont.setFamily("Calibri");
-    headerFont.setPixelSize(1200/dpiPercent);
-    headerFont.setWeight(1200/dpiPercent);
-    painter.setFont( headerFont );
-
-    QPoint offsetPdf, offsetDirect;
-    offsetPdf.setX( 50 );
-    offsetPdf.setY( 100 );
-    offsetDirect.setX( -50 );
-    offsetDirect.setY( 100 );
-
-    // First take the rows that fit into one page
-    for ( int h = 0; h < ui -> tableView -> model() -> rowCount(); h++ )
-    {
-        totalPageHeight += ui -> tableView -> rowHeight(h);
-        double totalPageWidth = ui -> tableView -> verticalHeader() -> width();
-
-        if ( rowCount == 49 || h == ui -> tableView -> model() -> rowCount() - 1 )
-        {
-            // Then take the columns that fit into one page
-            for ( int w = 0; w < ui -> tableView -> model() -> columnCount(); w++ )
-            {
-                totalPageWidth += ui -> tableView -> columnWidth(w);
-                if ( columnCount == 7 || (w == ui -> tableView -> model() -> columnCount() - 1) )
-                {
-                    sourceRect.setWidth( totalPageWidth );
-                    sourceRect.setHeight( totalPageHeight + 14 );
-
-                    if( pageCount == 1 )
-                    {
-                        painter.drawText( QPoint(50, 50), "Wygenerowano: " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm") );
-                        //painter.drawText( QPoint(50 + ui -> tableView -> columnWidth(0), 50), "Od: " + ui -> dateTimeStart -> dateTime().toString("yyyy-MM-dd hh") );
-                        //painter.drawText( QPoint(50 + ui -> tableView -> columnWidth(0), 75), "Do: " + ui -> dateTimeEnd -> dateTime().toString("yyyy-MM-dd hh") );
-                    }
-                    painter.drawPixmap( printer.pageRect().topLeft()+offsetPdf, pixmap, sourceRect );
-                    sourceRect.setLeft( sourceRect.left() + totalPageWidth );
-
-                    if ( w != ui -> tableView -> model() -> columnCount() - 1 )
-                        printer.newPage();
-
-                    totalPageWidth = 0;
-                    columnCount = 0;
-                }
-                else
-                {
-                    columnCount++;
-                }
-            }
-
-
-            sourceRect.setTop( sourceRect.top() + totalPageHeight + 7 );
-            sourceRect.setLeft( 0 );
-
-            if (h != ui -> tableView -> model() -> rowCount() - 1)
-            {
-                ++pageCount;
-                printer.newPage();
-            }
-
-            totalPageHeight = 0;
-            rowCount = 0;
-        }
-        else
-        {
-            rowCount++;
-        }
+    if(sqlModel->index(sqlModel->rowCount()-1,1).data().toString().isEmpty() ||
+       sqlModel->index(sqlModel->rowCount()-1,2).data().toString().isEmpty()) {
+        QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPowód: Imię oraz nazwisko musi być uzupełnione."));
+        return false;
     }
-
-    QMessageBox::information( this, "Informacja", "Wyeksportowano do pliku:\n" + pdfFile );
-}
-
-void MainWindow::on_timer_overflow()
-{
-    if(!isConnectedToNetwork()) {
-        QMessageBox::critical(this,QString("Informacja"),QString("Połaczenie z bazą danych zostało przerwane!\nNastąpi przejście do okna logowania."));
-        qApp->exit( MainWindow::EXIT_CODE_REBOOT );
+    if(name.contains(" ") || surename.contains(" ")) {
+         QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPowód: Imię lub nazwisko zawiera pusty znak (" ")."));
+         return false;
     }
-    timer->start(5000);
+    return true;
 }
+
+

@@ -67,3 +67,14 @@ bool LoginDialog::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
+
+void LoginDialog::on_pushButton_clicked()
+{
+    static bool isPasswordVisible = true;
+    isPasswordVisible = !isPasswordVisible;
+
+    isPasswordVisible == true ? ui->passwordLineEdit->setEchoMode(QLineEdit::Normal)
+                              : ui->passwordLineEdit->setEchoMode(QLineEdit::Password);
+
+    ui->passwordLineEdit->setFocus();
+}

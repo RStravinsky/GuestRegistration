@@ -11,5 +11,7 @@
         <file>images/add_person.png</file>
         <file>images/delete_person.png</file>
         <file>images/submit.png</file>
+        <file>images/eye.png</file>
+        <file>images/calendar.png</file>
     </qresource>
 </RCC>

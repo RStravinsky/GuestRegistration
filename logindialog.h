@@ -7,6 +7,8 @@
 #include <QSql>
 #include <QSqlDatabase>
 #include <QKeyEvent>
+#include <QDebug>
+#include <exportdialog.h>
 
 namespace Ui {
 class LoginDialog;
@@ -24,6 +26,7 @@ public:
 
 private slots:
     void on_loginButton_clicked();
+    void on_pushButton_clicked();
 
 signals:
     void sendAccess(QString login, QString password);
