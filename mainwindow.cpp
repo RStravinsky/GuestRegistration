@@ -129,7 +129,6 @@ void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
         ExportDialog exportDialog(sqlModel,this);
         exportDialog.exec();
     }
-        //exportToPDF();
 }
 
 void MainWindow::on_timer_overflow()
@@ -265,14 +264,16 @@ bool MainWindow::dataIsCorrect()
 
     if(sqlModel->index(sqlModel->rowCount()-1,1).data().toString().isEmpty() ||
        sqlModel->index(sqlModel->rowCount()-1,2).data().toString().isEmpty()) {
-        QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPowód: Imię oraz nazwisko musi być uzupełnione."));
+        QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię oraz nazwisko musi być uzupełnione."));
         return false;
     }
     if(name.contains(" ") || surename.contains(" ")) {
-         QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPowód: Imię lub nazwisko zawiera pusty znak (" ")."));
+         QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię lub nazwisko zawiera pusty znak (" ")."));
          return false;
+
     }
     return true;
 }
+
 
 

@@ -15,8 +15,6 @@
 #include <QSqlQuery>
 #include <QTimer>
 #include <QtNetwork/QNetworkInterface>
-#include <QPainter>
-#include <QtPrintSupport>
 #include <QHeaderView>
 #include <qspreadsheetheaderview.h>
 #include "logindialog.h"

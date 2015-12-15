@@ -7,7 +7,10 @@ ExportDialog::ExportDialog(ModSqlTableModel * model, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    sqlModel = new ModSqlTableModel(model);
+    sqlModel = new ModSqlTableModel;
+    sqlModel->setTable("registration");
+    sqlModel->sort(6,Qt::AscendingOrder);
+    sqlModel->select();
 
     // start Calendar
     QMenu* startMenu = new QMenu(ui->startDateButton);
@@ -63,7 +66,6 @@ void ExportDialog::on_dateClicked(QDate date)
     }
 }
 
-
 void ExportDialog::on_exportButton_clicked()
 {
     QDate startDate = QDate::fromString(ui->startDateLineEdit->text(),"yyyy-MM-dd");
@@ -71,9 +73,114 @@ void ExportDialog::on_exportButton_clicked()
     if(startDate > stopDate )
                 QMessageBox::information(this,QString("Informacja"),QString("Data końcowa jest większa niż data początkowa."));
     else {
-        sqlModel->setFilter("ArrivalTime between "+startDate.toString("yyyy-MM-dd")+" And "+stopDate.toString("yyyy-MM-dd")+"");
-        // exportToPDF
+        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '"+stopDate.toString("yyyy-MM-dd")+"'");
+        populatePDF();
         ExportDialog::accept();
     }
-
 }
+
+void ExportDialog::on_pathButton_clicked()
+{
+    QString pdfFile;
+    QString filters( "Pliki PDF (*.pdf);;Wszystkie pliki (*.*)" );
+    QString pdfFilter( "Pliki PDF (*.pdf)" );
+
+    pdfFile = QFileDialog::getSaveFileName( this, "Wyeksportuj do pliku", QDir::homePath(), filters, &pdfFilter );
+    ui->pathLineEdit->setText(pdfFile);
+}
+
+QTextTableFormat ExportDialog::tableFormat()
+{
+    QTextTableFormat tableFormat;
+    tableFormat.setAlignment(Qt::AlignCenter);
+    tableFormat.setCellSpacing(0);
+    tableFormat.setCellPadding(3);
+    tableFormat.setTopMargin(10);
+    tableFormat.setBottomMargin(10);
+    tableFormat.setBorderBrush(Qt::black);
+
+    QVector<QTextLength> widths;
+    widths << QTextLength(QTextLength::PercentageLength, 2) << QTextLength(QTextLength::PercentageLength, 14) << QTextLength(QTextLength::PercentageLength, 15)
+           << QTextLength(QTextLength::PercentageLength, 9) << QTextLength(QTextLength::PercentageLength, 8) << QTextLength(QTextLength::PercentageLength, 10)
+           << QTextLength(QTextLength::PercentageLength, 18) << QTextLength(QTextLength::PercentageLength, 24);
+
+    tableFormat.setColumnWidthConstraints(widths);
+    return tableFormat;
+}
+
+void ExportDialog::addHeaderToDocument(QTextCursor *cursor, QString &title)
+{
+    QTextBlockFormat blockFormat;
+    blockFormat.setAlignment(Qt::AlignLeft);
+    blockFormat.setTopMargin(0);
+    //cursor->insertBlock(blockFormat);
+    //cursor->insertImage(":/images/images/sigma.png");
+    //blockFormat.setLeftMargin(40);
+    QTextCharFormat charFormat;
+    charFormat.setFont(QFont("Calibri", 9, QFont::Bold));
+    cursor->insertText(title, charFormat);
+}
+
+void ExportDialog::populateTable(QTextCursor *cursor)
+{
+    QTextCursor tableCursor;
+    QTextBlockFormat blockFormat;
+    QTextTable *table = cursor->insertTable(sqlModel->rowCount() + 1, sqlModel->columnCount(), tableFormat());
+
+    QStringList headerList ({"L.p.","Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
+
+    for(int i = 1; i < sqlModel->rowCount() + 1; ++i) {
+        tableCursor = table->cellAt(i,0).firstCursorPosition();
+        blockFormat.setAlignment(Qt::AlignHCenter);
+        tableCursor.insertBlock(blockFormat);
+        tableCursor.insertText(QString::number(i));
+    }
+
+     for(int j = 0; j < sqlModel->columnCount(); ++j) {
+         tableCursor = table->cellAt(0,j).firstCursorPosition();
+         blockFormat.setAlignment(Qt::AlignHCenter);
+         tableCursor.insertBlock(blockFormat);
+         tableCursor.insertText(headerList.at(j));
+     }
+
+    for(int i = 1; i < sqlModel->rowCount() + 1; ++i) {
+
+        for(int j = 1; j < sqlModel->columnCount(); ++j) {
+
+            tableCursor = table->cellAt(i,j).firstCursorPosition();
+
+            if(j == 6 || j == 7) {
+                blockFormat.setAlignment(Qt::AlignHCenter);
+                tableCursor.insertBlock(blockFormat);
+                tableCursor.insertText(sqlModel->index(i-1, j).data().toString().replace("T"," "));
+            }
+            else {
+                blockFormat.setAlignment(Qt::AlignHCenter);
+                tableCursor.insertBlock(blockFormat);
+                tableCursor.insertText(sqlModel->index(i-1, j).data().toString());
+            }
+        }
+    }
+}
+
+void ExportDialog::populatePDF()
+{
+    QTextDocument document;
+    document.setDefaultFont(QFont("Calibri", 9));
+    QTextCursor textCursor(&document);
+    QString headerText = "Wygenerowano: " + QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss");
+
+    addHeaderToDocument(&textCursor, headerText);
+    populateTable(&textCursor);
+
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFileName(ui->pathLineEdit->text());
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    document.print(&printer);
+
+    QMessageBox::information( this, "Informacja", "Wyeksportowano do pliku:\n" + ui->pathLineEdit->text() );
+
+    QDesktopServices::openUrl(ui->pathLineEdit->text());
+}
+
+

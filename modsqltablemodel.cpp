@@ -1,6 +1,5 @@
 #include "modsqltablemodel.h"
 
-
 Qt::ItemFlags ModSqlTableModel::flags(const QModelIndex &index) const
 {
 
