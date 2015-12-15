@@ -119,7 +119,8 @@ void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
         qApp->exit( MainWindow::EXIT_CODE_REBOOT );
 
     if( mainButton == ui->generateButton )
-        exportToPDF();
+        //exportToPDF();
+        populatePDF();
 }
 
 void MainWindow::addStatusBar()
@@ -200,6 +201,112 @@ bool MainWindow::submit(ModSqlTableModel *&model)
     }
 }
 
+QTextTableFormat MainWindow::tableFormat()
+{
+    QTextTableFormat tableFormat;
+    tableFormat.setAlignment(Qt::AlignCenter);
+    tableFormat.setCellSpacing(0);
+    tableFormat.setCellPadding(3);
+    tableFormat.setTopMargin(10);
+    tableFormat.setBottomMargin(10);
+    tableFormat.setBorderBrush(Qt::black);
+
+    QVector<QTextLength> widths;
+    widths << QTextLength(QTextLength::PercentageLength, 2) << QTextLength(QTextLength::PercentageLength, 14) << QTextLength(QTextLength::PercentageLength, 15)
+           << QTextLength(QTextLength::PercentageLength, 9) << QTextLength(QTextLength::PercentageLength, 8) << QTextLength(QTextLength::PercentageLength, 10)
+           << QTextLength(QTextLength::PercentageLength, 18) << QTextLength(QTextLength::PercentageLength, 24);
+
+    tableFormat.setColumnWidthConstraints(widths);
+    return tableFormat;
+}
+
+void MainWindow::addHeaderToDocument(QTextCursor *cursor, QString &title)
+{
+
+    QTextBlockFormat blockFormat;
+    blockFormat.setAlignment(Qt::AlignLeft);
+    blockFormat.setTopMargin(0);
+    //cursor->insertBlock(blockFormat);
+    //cursor->insertImage(":/images/images/sigma.png");
+    //blockFormat.setLeftMargin(40);
+    QTextCharFormat charFormat;
+    charFormat.setFont(QFont("Calibri", 9, QFont::Bold));
+    cursor->insertText(title, charFormat);
+}
+
+void MainWindow::populateTable(QTextCursor *cursor)
+{
+    QTextCursor tableCursor;
+    QTextBlockFormat blockFormat;
+    QTextTable *table = cursor->insertTable(sqlModel->rowCount() + 1, sqlModel->columnCount(), tableFormat());
+
+    QStringList headerList ({"L.p.","Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
+
+    for(int i = 1; i < sqlModel->rowCount() + 1; ++i) {
+        tableCursor = table->cellAt(i,0).firstCursorPosition();
+        blockFormat.setAlignment(Qt::AlignHCenter);
+        tableCursor.insertBlock(blockFormat);
+        tableCursor.insertText(QString::number(i));
+    }
+
+     for(int j = 0; j < sqlModel->columnCount(); ++j) {
+         tableCursor = table->cellAt(0,j).firstCursorPosition();
+         blockFormat.setAlignment(Qt::AlignHCenter);
+         tableCursor.insertBlock(blockFormat);
+         tableCursor.insertText(headerList.at(j));
+     }
+
+
+    for(int i = 1; i < sqlModel->rowCount() + 1; ++i) {
+
+        for(int j = 1; j < sqlModel->columnCount(); ++j) {
+
+            tableCursor = table->cellAt(i,j).firstCursorPosition();
+
+            if(j == 6 || j == 7) {
+                blockFormat.setAlignment(Qt::AlignHCenter);
+                tableCursor.insertBlock(blockFormat);
+                tableCursor.insertText(sqlModel->index(i-1, j).data().toString().replace("T"," "));
+            }
+            else {
+                blockFormat.setAlignment(Qt::AlignHCenter);
+                tableCursor.insertBlock(blockFormat);
+                tableCursor.insertText(sqlModel->index(i-1, j).data().toString());
+            }
+        }
+
+    }
+
+
+}
+
+void MainWindow::populatePDF()
+{
+    QString pdfFile;
+    QString filters( "Pliki PDF (*.pdf);;Wszystkie pliki (*.*)" );
+    QString pdfFilter( "Pliki PDF (*.pdf)" );
+
+    pdfFile = QFileDialog::getSaveFileName( this, "Wyeksportuj do pliku", QDir::homePath(), filters, &pdfFilter );
+
+
+    QTextDocument document;
+    document.setDefaultFont(QFont("Calibri", 9));
+    QTextCursor textCursor(&document);
+    QString headerText = "Wygenerowano: " + QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss");
+
+    addHeaderToDocument(&textCursor, headerText);
+    populateTable(&textCursor);
+
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFileName(pdfFile);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    document.print(&printer);
+
+    QMessageBox::information( this, "Informacja", "Wyeksportowano do pliku:\n" + pdfFile );
+
+    QDesktopServices::openUrl(pdfFile);
+}
+
 void MainWindow::on_deleteButton_clicked()
 {
     if(!isAdded) {
@@ -209,7 +316,7 @@ void MainWindow::on_deleteButton_clicked()
             query.prepare("call guestregistration.fillDepartureTime(:id)");
             query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
             if(!query.exec()) {
-                QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
+                QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powiodło się."));
                 return;
             }
             sqlModel->select();
@@ -219,138 +326,6 @@ void MainWindow::on_deleteButton_clicked()
     }
     else
         QMessageBox::information(this,QString("Informacja"),QString("Nie można usunąć przed zatwierdzeniem."));
-}
-
-QPixmap MainWindow::grabTable()
-{
-    const int rows = ui -> tableView -> model() -> rowCount();
-    const int columns = ui -> tableView -> model() -> columnCount();
-
-    double totalWidth = ui -> tableView -> verticalHeader() -> width();
-    for ( int c = 0; c < columns; ++c )
-        totalWidth += ui -> tableView -> columnWidth(c);
-
-    double totalHeight = ui -> tableView -> horizontalHeader() -> height();
-    for ( int r = 0; r < rows; ++r )
-        totalHeight += ui -> tableView -> rowHeight(r);
-
-    QTableView tempTable( ui->tableView );
-    tempTable.setFixedHeight( totalHeight );
-    tempTable.setModel( ui -> tableView -> model() );
-    tempTable.setFixedSize( totalWidth, totalHeight );
-    tempTable.setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    tempTable.setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    tempTable.verticalHeader() -> hide();
-    tempTable.horizontalHeader()->setStyleSheet("font: 22px;");
-
-
-    for ( int i = 0; i < ui -> tableView -> model() -> columnCount() ; ++i )
-        tempTable.setColumnWidth( i, ui -> tableView -> columnWidth(0) );
-    tempTable.horizontalHeader() -> setStretchLastSection( true );
-
-    QPixmap grabPixmap = QPixmap::grabWidget( &tempTable );
-    return grabPixmap;
-
-}
-
-void MainWindow::exportToPDF()
-{
-    QPrinter printer( QPrinter::HighResolution );
-    QString pdfFile;
-    QString filters( "Pliki PDF (*.pdf);;Wszystkie pliki (*.*)" );
-    QString pdfFilter( "Pliki PDF (*.pdf)" );
-
-    pdfFile = QFileDialog::getSaveFileName( this, "Wyeksportuj do pliku", QDir::homePath(), filters, &pdfFilter );
-
-    if (pdfFile.isEmpty()) return;
-
-    printer.setOutputFileName( pdfFile );
-    printer.setOutputFormat( QPrinter::PdfFormat );
-    printer.setFullPage( true );
-    printer.setPageMargins( 15, 0, 15, 0, QPrinter::Millimeter );
-
-
-    QPainter painter( &printer );
-    painter.scale( 8, 8 );
-
-    QPixmap pixmap = grabTable();
-
-    QRectF sourceRect;
-    double totalPageHeight = ui -> tableView -> horizontalHeader() -> height();
-    int columnCount = 0;
-    int rowCount = 0;
-    int pageCount = 1;
-
-    QFont headerFont;
-    headerFont.setFamily("Calibri");
-    headerFont.setPixelSize(1200/dpiPercent);
-    headerFont.setWeight(1200/dpiPercent);
-    painter.setFont( headerFont );
-
-    QPoint offsetPdf, offsetDirect;
-    offsetPdf.setX( 50 );
-    offsetPdf.setY( 100 );
-    offsetDirect.setX( -50 );
-    offsetDirect.setY( 100 );
-
-    // First take the rows that fit into one page
-    for ( int h = 0; h < ui -> tableView -> model() -> rowCount(); h++ )
-    {
-        totalPageHeight += ui -> tableView -> rowHeight(h);
-        double totalPageWidth = ui -> tableView -> verticalHeader() -> width();
-
-        if ( rowCount == 49 || h == ui -> tableView -> model() -> rowCount() - 1 )
-        {
-            // Then take the columns that fit into one page
-            for ( int w = 0; w < ui -> tableView -> model() -> columnCount(); w++ )
-            {
-                totalPageWidth += ui -> tableView -> columnWidth(w);
-                if ( columnCount == 7 || (w == ui -> tableView -> model() -> columnCount() - 1) )
-                {
-                    sourceRect.setWidth( totalPageWidth );
-                    sourceRect.setHeight( totalPageHeight + 14 );
-
-                    if( pageCount == 1 )
-                    {
-                        painter.drawText( QPoint(50, 50), "Wygenerowano: " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm") );
-                        //painter.drawText( QPoint(50 + ui -> tableView -> columnWidth(0), 50), "Od: " + ui -> dateTimeStart -> dateTime().toString("yyyy-MM-dd hh") );
-                        //painter.drawText( QPoint(50 + ui -> tableView -> columnWidth(0), 75), "Do: " + ui -> dateTimeEnd -> dateTime().toString("yyyy-MM-dd hh") );
-                    }
-                    painter.drawPixmap( printer.pageRect().topLeft()+offsetPdf, pixmap, sourceRect );
-                    sourceRect.setLeft( sourceRect.left() + totalPageWidth );
-
-                    if ( w != ui -> tableView -> model() -> columnCount() - 1 )
-                        printer.newPage();
-
-                    totalPageWidth = 0;
-                    columnCount = 0;
-                }
-                else
-                {
-                    columnCount++;
-                }
-            }
-
-
-            sourceRect.setTop( sourceRect.top() + totalPageHeight + 7 );
-            sourceRect.setLeft( 0 );
-
-            if (h != ui -> tableView -> model() -> rowCount() - 1)
-            {
-                ++pageCount;
-                printer.newPage();
-            }
-
-            totalPageHeight = 0;
-            rowCount = 0;
-        }
-        else
-        {
-            rowCount++;
-        }
-    }
-
-    QMessageBox::information( this, "Informacja", "Wyeksportowano do pliku:\n" + pdfFile );
 }
 
 void MainWindow::on_timer_overflow()

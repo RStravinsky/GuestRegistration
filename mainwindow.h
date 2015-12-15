@@ -17,6 +17,8 @@
 #include <QtNetwork/QNetworkInterface>
 #include <QPainter>
 #include <QtPrintSupport>
+#include <QTextCursor>
+#include <QTextFrame>
 #include "logindialog.h"
 #include "modsqltablemodel.h"
 
@@ -60,8 +62,11 @@ private:
     void addStatusBar();
     void configureTable();
     bool submit(ModSqlTableModel *&model);
-    void exportToPDF();
-    QPixmap grabTable();
+
+    void populatePDF();
+    QTextTableFormat tableFormat();
+    void addHeaderToDocument(QTextCursor *cursor, QString &title);
+    void populateTable(QTextCursor *cursor);
 };
 
 #endif // MAINWINDOW_H
