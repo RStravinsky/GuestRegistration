@@ -42,6 +42,8 @@ private slots:
     void on_timer_overflow();
     void on_lineEdit_textChanged(const QString &arg1);
 
+    void on_sigmaButton_clicked();
+
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
 

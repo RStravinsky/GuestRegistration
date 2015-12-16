@@ -2,6 +2,7 @@
 #define QSPREADSHEETHEADERVIEW_H
 
 #include <QHeaderView>
+#include <QDebug>
 
 /*!
     \class QSpreadsheetHeaderView
@@ -22,6 +23,11 @@ protected:
     QRect sectionRect(int logicalIndex) const;
     QRect buttonMenuRect(int logicalIndex) const;
     void drawMenuButton(QPainter *painter, int logicalIndex, bool enabled) const;
+
+    QRect prevRect(int logicalIndex) const;
+    QRect nextRect(int logicalIndex) const;
+    void drawPrevButton(QPainter *painter, int logicalIndex) const;
+    void drawNextButton(QPainter *painter, int logicalIndex) const;
 
 private:
 

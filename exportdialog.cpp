@@ -1,7 +1,7 @@
 #include "exportdialog.h"
 #include "ui_exportdialog.h"
 
-ExportDialog::ExportDialog(ModSqlTableModel * model, QWidget *parent) :
+ExportDialog::ExportDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ExportDialog)
 {
@@ -37,6 +37,8 @@ ExportDialog::ExportDialog(ModSqlTableModel * model, QWidget *parent) :
     connect( stopCalendar, SIGNAL(clicked(QDate)), this, SLOT(on_dateClicked(QDate)) );
 
     connect(ui->cancelButton,SIGNAL(clicked()),this,SLOT(reject()));
+
+    ui->dataComboBox->setVisible(false);
 }
 
 ExportDialog::~ExportDialog()
@@ -68,15 +70,36 @@ void ExportDialog::on_dateClicked(QDate date)
 
 void ExportDialog::on_exportButton_clicked()
 {
-    QDate startDate = QDate::fromString(ui->startDateLineEdit->text(),"yyyy-MM-dd");
-    QDate stopDate = QDate::fromString(ui->stopDateLineEdit->text(),"yyyy-MM-dd");
-    if(startDate > stopDate )
-                QMessageBox::information(this,QString("Informacja"),QString("Data końcowa jest większa niż data początkowa."));
-    else {
-        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '"+stopDate.toString("yyyy-MM-dd")+"'");
-        populatePDF();
-        ExportDialog::accept();
+    if(ui->pathLineEdit->text().isEmpty()) {
+        QMessageBox::information(this,QString("Informacja"),QString("Nie wybrano pliku do eksportu."));
+        return;
     }
+
+    if(ui->categoriesComboBox->currentText() == "Data") {
+        QDate startDate = QDate::fromString(ui->startDateLineEdit->text(),"yyyy-MM-dd");
+        QDate stopDate = QDate::fromString(ui->stopDateLineEdit->text(),"yyyy-MM-dd");
+
+        if(ui->startDateLineEdit->text().isEmpty() || ui->stopDateLineEdit->text().isEmpty()) {
+            QMessageBox::information(this,QString("Informacja"),QString("Daty muszą być uzupełnione."));
+            return;
+        }
+        else if(startDate > stopDate ) {
+            QMessageBox::information(this,QString("Informacja"),QString("Data końcowa jest większa niż data początkowa."));
+            return;
+        }
+        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '"+stopDate.toString("yyyy-MM-dd")+"'");
+    }
+    else {
+        QString headerName;
+        if(ui->categoriesComboBox->currentText() == "Nazwisko") headerName = QString("Surname");
+        else if(ui->categoriesComboBox->currentText() == "Firma") headerName = QString("Company");
+        else if(ui->categoriesComboBox->currentText() == "Tablica rejestracyjna") headerName = QString("LicensePlate");
+        qDebug() << ""+headerName+"="+ui->dataComboBox->currentText()+"" << endl;
+        sqlModel->setFilter(""+headerName+"='"+ui->dataComboBox->currentText()+"'");
+    }
+
+    populatePDF();
+    ExportDialog::accept();
 }
 
 void ExportDialog::on_pathButton_clicked()
@@ -87,6 +110,7 @@ void ExportDialog::on_pathButton_clicked()
 
     pdfFile = QFileDialog::getSaveFileName( this, "Wyeksportuj do pliku", QDir::homePath(), filters, &pdfFilter );
     ui->pathLineEdit->setText(pdfFile);
+    ui->pathLineEdit->setCursorPosition(0);
 }
 
 QTextTableFormat ExportDialog::tableFormat()
@@ -184,3 +208,47 @@ void ExportDialog::populatePDF()
 }
 
 
+void ExportDialog::on_categoriesComboBox_currentIndexChanged(const QString &arg1)
+{
+    static QString previousArg1{};
+
+    if (previousArg1 != arg1) {
+
+        QString headerName;
+        [arg1,&headerName] {
+            if(arg1 == "Nazwisko") headerName = QString("Surname");
+            else if(arg1 == "Firma") headerName = QString("Company");
+            else if(arg1 == "Tablica rejestracyjna") headerName = QString("LicensePlate");
+            else headerName = QString("Date");
+        }();
+
+        if(headerName == "Date") {
+            ui->startDateButton->setVisible(true);
+            ui->startDateLineEdit->setVisible(true);
+            ui->stopDateButton->setVisible(true);
+            ui->stopDateLineEdit->setVisible(true);
+            ui->dataComboBox->setVisible(false);
+        }
+        else {
+            ui->startDateButton->setVisible(false);
+            ui->startDateLineEdit->setVisible(false);
+            ui->stopDateButton->setVisible(false);
+            ui->stopDateLineEdit->setVisible(false);
+            ui->dataComboBox->setVisible(true);
+        }
+
+        int categoriesIdx = 0;
+        for(int i = 0; i < sqlModel->columnCount(); ++i)
+            if(sqlModel->headerData(i, Qt::Horizontal).toString() == headerName)
+                categoriesIdx = i;
+
+       ui->dataComboBox->clear();
+       for(int i=0; i<sqlModel->rowCount();++i) {
+            QString data = sqlModel->index(i,categoriesIdx).data().toString();
+            if(!data.isEmpty())
+            ui->dataComboBox->addItem(data);
+       }
+   }
+
+   previousArg1 = arg1;
+}

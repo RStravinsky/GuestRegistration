@@ -8,12 +8,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     addStatusBar();
     ui->logoutButton->installEventFilter(this);
     ui->helpButton->installEventFilter(this);
     ui->generateButton->installEventFilter(this);
-    ui->tableView->installEventFilter(this);
+
     connect(this,SIGNAL(mainButtonReleased(const QPushButton*)),this,SLOT(on_mainButtonReleased(const QPushButton*)));
+
+    timer = new QTimer(this);
 }
 
 MainWindow::~MainWindow()
@@ -64,7 +67,6 @@ void MainWindow::loadSqlModel()
 
     configureTable();
 
-    timer = new QTimer(this);
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(on_timer_overflow()));
     timer->start(5000);
 }
@@ -110,12 +112,10 @@ void MainWindow::on_sendAccess(QString login,QString password)
    if((login=="root" && password=="Serwis4q@") || (login=="solid" && password=="solidsigmasa")) {
        ui->addButton->setVisible(true);
        ui->deleteButton->setVisible(true);
-       ui->line->setVisible(true);
    }
    else {
        ui->addButton->setVisible(false);
-       ui->deleteButton->setVisible(false);
-       ui->line->setVisible(false);
+       ui->deleteButton->setVisible(false);;
    }
    Statlabel->setText("<font color='white'>Połączono z użytkownikiem: <b><font color='green'>"+login+"</font></b></font>");
 }
@@ -126,7 +126,7 @@ void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
         qApp->exit( MainWindow::EXIT_CODE_REBOOT );
 
     if( mainButton == ui->generateButton ) {
-        ExportDialog exportDialog(sqlModel,this);
+        ExportDialog exportDialog(this);
         exportDialog.exec();
     }
 }
@@ -277,3 +277,14 @@ bool MainWindow::dataIsCorrect()
 
 
 
+
+void MainWindow::on_sigmaButton_clicked()
+{
+    static bool isSigma = false;
+    isSigma = !isSigma;
+
+    if(isSigma)
+        ui->sigmaButton->setIcon(QIcon(":/images/images/onlySigma.png"));
+    if(!isSigma)
+        ui->sigmaButton->setIcon(QIcon(":/images/images/onlySigmaChecked.png"));
+}
