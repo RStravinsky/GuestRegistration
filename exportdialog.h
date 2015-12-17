@@ -24,13 +24,15 @@ class ExportDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ExportDialog(ModSqlTableModel *model,QWidget *parent = 0);
+    explicit ExportDialog(QWidget *parent = 0);
     ~ExportDialog();
 
 private slots:
     void on_dateClicked(QDate date);
     void on_exportButton_clicked();
     void on_pathButton_clicked();
+
+    void on_categoriesComboBox_currentIndexChanged(const QString &arg1);
 
 private:
     Ui::ExportDialog *ui;

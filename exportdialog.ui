@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>511</width>
-    <height>236</height>
+    <height>329</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,32 +24,44 @@
   border-radius: 5px;
 }
 
-#ExportDialog QLineEdit:focus {
-  color: gray;
-  border: 3px solid rgb(8,142,140);
-  border-radius: 5px;
-}
-
-#ExportDialog {
-  background: black;
-}
-
-#ExportDialog QLineEdit {
-  color: gray;
-  border: 2px solid lightgray;
-  border-radius: 5px;
-}
-
-#ExportDialog QLineEdit:focus {
-  color: gray;
-  border: 3px solid rgb(8,142,140);
-  border-radius: 5px;
-}
-
 QCalendarWidget { 
 font-size:10pt; 
 font-family:Calibri;
 }
+
+#ExportDialog QScrollBar:vertical {
+  border: none;
+  background: &quot;transparent&quot;;
+  width: 15px;
+  margin: 20px 0px 20px 0px;
+}
+
+#ExportDialog QScrollBar::handle:vertical {
+  background: &quot;lightgray&quot;;
+  min-height: 20px;
+  border-radius: 2px;
+}
+
+#ExportDialog QScrollBar::add-line:vertical {
+  image: url(:/images/images/downArrow.png);
+  background: &quot;lightgray&quot;;
+  height: 15px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin;
+  border-radius: 2px;
+}
+
+#ExportDialog QScrollBar::sub-line:vertical {
+  image: url(:/images/images/upArrow.png);
+  background: &quot;lightgray&quot;;
+  height: 15px;
+  subcontrol-position: top;
+  subcontrol-origin: margin;
+  border-radius: 2px;
+}
+
+
+
 
 
 
@@ -63,7 +75,7 @@ font-family:Calibri;
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>140</y>
+     <y>230</y>
      <width>233</width>
      <height>51</height>
     </rect>
@@ -107,7 +119,7 @@ background: rgb(80,80,80);
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>140</y>
+     <y>230</y>
      <width>233</width>
      <height>51</height>
     </rect>
@@ -167,6 +179,9 @@ background: rgb(80,80,80);
    <property name="text">
     <string/>
    </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
    <property name="placeholderText">
     <string>Plik docelowy</string>
    </property>
@@ -219,7 +234,7 @@ background: rgb(80,80,80);
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>80</y>
+     <y>160</y>
      <width>55</width>
      <height>51</height>
     </rect>
@@ -253,7 +268,7 @@ background: rgb(80,80,80);
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>80</y>
+     <y>160</y>
      <width>55</width>
      <height>51</height>
     </rect>
@@ -286,8 +301,8 @@ background: rgb(80,80,80);
   <widget class="QLineEdit" name="startDateLineEdit">
    <property name="geometry">
     <rect>
-     <x>82</x>
-     <y>80</y>
+     <x>80</x>
+     <y>160</y>
      <width>171</width>
      <height>51</height>
     </rect>
@@ -313,8 +328,8 @@ background: rgb(80,80,80);
   <widget class="QLineEdit" name="stopDateLineEdit">
    <property name="geometry">
     <rect>
-     <x>322</x>
-     <y>80</y>
+     <x>320</x>
+     <y>160</y>
      <width>171</width>
      <height>51</height>
     </rect>
@@ -335,6 +350,133 @@ background: rgb(80,80,80);
    </property>
    <property name="placeholderText">
     <string>Data końcowa</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="categoriesComboBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>471</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri Light</family>
+     <pointsize>16</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox {
+  border-radius: 5px;
+  border: 2px solid lightgray;
+  background: &quot;white&quot;;
+  color: &quot;gray&quot;;
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+   padding-top: 2px;
+   padding-left: 2px;
+}
+
+QComboBox::drop-down {
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  right: 10px;
+  border: none;
+}
+
+QComboBox::down-arrow {
+  image: url(:/images/images/downArrow.png);
+  height: 30px;
+  width:  30px; 
+}
+
+QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+  top: 1px;
+  left: 1px;
+}
+
+
+
+</string>
+   </property>
+   <property name="currentText">
+    <string comment="0">Data</string>
+   </property>
+   <item>
+    <property name="text">
+     <string>Data</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Nazwisko</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Firma</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Tablica rejestracyjna</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QComboBox" name="dataComboBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>471</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri Light</family>
+     <pointsize>16</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox {
+  border-radius: 5px;
+  border: 2px solid lightgray;
+  background: &quot;white&quot;;
+  color: &quot;gray&quot;;
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+   padding-top: 2px;
+   padding-left: 2px;
+}
+
+QComboBox::drop-down {
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  right: 10px;
+  border: none;
+}
+
+QComboBox::down-arrow {
+  image: url(:/images/images/downArrow.png);
+  height: 30px;
+  width:  30px; 
+}
+
+QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+  top: 1px;
+  left: 1px;
+}
+
+</string>
    </property>
   </widget>
  </widget>
