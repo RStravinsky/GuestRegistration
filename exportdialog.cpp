@@ -94,8 +94,7 @@ void ExportDialog::on_exportButton_clicked()
         if(ui->categoriesComboBox->currentText() == "Nazwisko") headerName = QString("Surname");
         else if(ui->categoriesComboBox->currentText() == "Firma") headerName = QString("Company");
         else if(ui->categoriesComboBox->currentText() == "Tablica rejestracyjna") headerName = QString("LicensePlate");
-        qDebug() << ""+headerName+"="+ui->dataComboBox->currentText()+"" << endl;
-        sqlModel->setFilter(""+headerName+"='"+ui->dataComboBox->currentText()+"'");
+        sqlModel->setFilter(""+headerName+" LIKE '%"+ui->dataComboBox->currentText()+"%'");
     }
 
     populatePDF();
@@ -245,7 +244,7 @@ void ExportDialog::on_categoriesComboBox_currentIndexChanged(const QString &arg1
        ui->dataComboBox->clear();
        for(int i=0; i<sqlModel->rowCount();++i) {
             QString data = sqlModel->index(i,categoriesIdx).data().toString();
-            if(!data.isEmpty())
+            if(!data.isEmpty() && data!=QString("-----"))
             ui->dataComboBox->addItem(data);
        }
    }

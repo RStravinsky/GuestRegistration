@@ -52,7 +52,7 @@ void MainWindow::loadSqlModel()
 {
     sqlModel = new ModSqlTableModel(this);
     sqlModel->setTable("registration");
-    sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 10 DAY) And CURDATE()+1");
+    sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
     sqlModel->sort(6,Qt::AscendingOrder);
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sqlModel->select();
@@ -114,8 +114,9 @@ void MainWindow::on_sendAccess(QString login,QString password)
        ui->deleteButton->setVisible(true);
    }
    else {
+       login = QString("sigmasa");
        ui->addButton->setVisible(false);
-       ui->deleteButton->setVisible(false);;
+       ui->deleteButton->setVisible(false);
    }
    Statlabel->setText("<font color='white'>Połączono z użytkownikiem: <b><font color='green'>"+login+"</font></b></font>");
 }
@@ -178,87 +179,18 @@ void MainWindow::configureTable()
         ui->tableView->setColumnWidth(i,266);
         sqlModel->setHeaderData(i, Qt::Horizontal, headerList.at(i-1));
     };
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
 
     ui->tableView->horizontalHeader()->setFont(Font);
     ui->tableView->setFont(Font);
-}
-
-void MainWindow::on_addButton_clicked()
-{
-    static bool isSubmit = false;
-    if(!isSubmit) {
-        if(sqlModel->insertRow(sqlModel->rowCount())) {
-            isAdded = true;
-            ui->tableView->scrollToBottom();
-            isSubmit = !isSubmit;
-            ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
-            ui->addButton->setStyleSheet("QPushButton {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
-                                        "QPushButton:hover {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
-                                        "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                        "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
-        }
-        else
-            QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: Nie można dodać nowego wiersza.");
-    }
-    else {
-        if(submit(sqlModel)) {
-        isSubmit = !isSubmit;
-        isAdded = false;
-        ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
-        ui->addButton->setStyleSheet("QPushButton {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
-                                    "QPushButton:hover {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
-                                    "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                    "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
-        }
-    }
-}
-
-bool MainWindow::submit(ModSqlTableModel *&model)
-{
-    if(dataIsCorrect()) {
-        if(!model->submitAll()) {
-            QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: "+model->lastError().text()+"");
-            return false;
-        }
-        else {
-            QMessageBox::information(this,"Informacja","Dodano osobę.");
-            model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 10 DAY) And CURDATE()+1");
-            model->select();
-            return true;
-        }
-    }
-    else
-        return false;
-}
-
-void MainWindow::on_deleteButton_clicked()
-{
-    if(!isAdded) {
-        QModelIndexList indexes = ui->tableView->selectionModel()->selectedRows();
-        if (!indexes.isEmpty()) {
-            if(ui->tableView->model()->index(ui->tableView->currentIndex().row(),7).data().toString().isEmpty()) {
-                QSqlQuery query;
-                query.prepare("call guestregistration.fillDepartureTime(:id)");
-                query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
-                if(!query.exec()) {
-                    QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
-                    return;
-                }
-                sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 10 DAY) And CURDATE()+1");
-                sqlModel->select();
-            }
-            else
-                QMessageBox::information(this,QString("Informacja"),QString("Osoba już wyszła."));
-        }
-        else
-            QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
-    }
-    else
-        QMessageBox::information(this,QString("Informacja"),QString("Nie można usunąć przed zatwierdzeniem."));
+    ui->tableView->scrollToBottom();
 }
 
 bool MainWindow::dataIsCorrect()
 {
+    if(ModSqlTableModel::isGroup == true)
+        return true;
+
     QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
     QString surename = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
 
@@ -268,23 +200,265 @@ bool MainWindow::dataIsCorrect()
         return false;
     }
     if(name.contains(" ") || surename.contains(" ")) {
-         QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię lub nazwisko zawiera pusty znak (" ")."));
+         QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię lub nazwisko zawiera pusty znak (\" \")."));
          return false;
 
     }
     return true;
 }
 
+bool MainWindow::submit(ModSqlTableModel *&model)
+{
+    if(dataIsCorrect()) {
+        if(!model->submitAll()) {
+            if(!ModSqlTableModel::isGroup)
+                QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: "+model->lastError().text()+"");
+            else {
+                QMessageBox::warning(this,"Informacja","Nie dodano grupy.\nPrzyczyna: "+model->lastError().text()+"");
+                ModSqlTableModel::isGroup = false;
+            }
+            return false;
+        }
+        else {
+            if(!ModSqlTableModel::isGroup)
+                QMessageBox::information(this,"Informacja","Dodano osobę.");
+            else {
+                QMessageBox::information(this,"Informacja","Dodano grupę.");
+                ModSqlTableModel::isGroup = false;
+            }
+            model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+            model->select();
+            return true;
+        }
+    }
+    else
+        return false;
+}
 
+void MainWindow::on_addButton_clicked()
+{
+        static bool isSubmit = false;
+        if(!isSubmit) {
+            if(!sqlModel->isDirty()) {
+                if(sqlModel->insertRow(sqlModel->rowCount())) {
+                    qDebug() << ModSqlTableModel::isGroup << endl;
+                    ui->tableView->scrollToBottom();
+                    isSubmit = !isSubmit;
+                    ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
+                    ui->addButton->setStyleSheet("QPushButton:hover {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
+                                                "QPushButton {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
+                                                "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                                "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
+                }
+                else
+                    QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: Nie można dodać nowego wiersza.");
+            }
+            else
+                QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+        }
+        else {
+            if(submit(sqlModel)) {
+            isSubmit = !isSubmit;
+            ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
+            ui->addButton->setStyleSheet("QPushButton:hover {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
+                                        "QPushButton {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
+                                        "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                        "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
+            }
+        }
+}
 
+void MainWindow::on_deleteButton_clicked()
+{
+    if(!sqlModel->isDirty()) {
+            QModelIndexList indexes = ui->tableView->selectionModel()->selectedRows();
+            if (!indexes.isEmpty()) {
+                QString firstRow = ui->tableView->model()->index(ui->tableView->currentIndex().row(),1).data().toString();
+                if(firstRow!=QString("-----")) {
+                    if(ui->tableView->model()->index(ui->tableView->currentIndex().row(),7).data().toString().isEmpty()) {
+                            QSqlQuery query;
+                            query.prepare("call guestregistration.fillDepartureTime(:id)");
+                            query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
+                            if(!query.exec()) {
+                                QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
+                                return;
+                            }
+                            sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+                            sqlModel->select();
+                            }
+                    else
+                        QMessageBox::information(this,QString("Informacja"),QString("Osoba już wyszła."));
+                }
+                else
+                    QMessageBox::information(this,QString("Informacja"),QString("Przycisk dotyczy osoby a nie grupy."));
+            }
+            else
+                QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
+    }
+    else
+        QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+}
+
+void MainWindow::on_addGroupButton_clicked()
+{
+        static bool isSubmit = false;
+        if(!isSubmit) {
+            if(!sqlModel->isDirty()) {
+                if(sqlModel->insertRow(sqlModel->rowCount())) {
+                    ui->tableView->scrollToBottom();
+                    isSubmit = !isSubmit;
+                    ui->addGroupButton->setIcon(QIcon(":/images/images/submit.png"));
+                    ui->addGroupButton->setStyleSheet("QPushButton:hover {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
+                                                "QPushButton {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
+                                                "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                                "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
+
+                    sqlModel->setData(sqlModel->index(sqlModel->rowCount()-1,1), "-----");
+                    sqlModel->setData(sqlModel->index(sqlModel->rowCount()-1,2), "-----");
+                    ModSqlTableModel::isGroup = true;
+                }
+                else
+                    QMessageBox::warning(this,"Informacja","Nie dodano grupy.\nPrzyczyna: Nie można dodać nowego wiersza.");
+            }
+            else
+                QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+        }
+        else {
+            if(submit(sqlModel)) {
+            isSubmit = !isSubmit;
+            ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
+            ui->addGroupButton->setStyleSheet("QPushButton:hover {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
+                                        "QPushButton {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
+                                        "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                                        "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
+            }
+        }
+}
+
+void MainWindow::on_deleteGroup_clicked()
+{
+    if(!sqlModel->isDirty()) {
+            QModelIndexList indexes = ui->tableView->selectionModel()->selectedRows();
+            if (!indexes.isEmpty()) {
+                QString firstRow = ui->tableView->model()->index(ui->tableView->currentIndex().row(),1).data().toString();
+                if(firstRow==QString("-----")) {
+                    if(ui->tableView->model()->index(ui->tableView->currentIndex().row(),7).data().toString().isEmpty()) {
+                            QSqlQuery query;
+                            query.prepare("call guestregistration.fillDepartureTime(:id)");
+                            query.bindValue(":id", ui->tableView->model()->index(ui->tableView->currentIndex().row(),0).data().toInt());
+                            if(!query.exec()) {
+                                QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
+                                return;
+                            }
+                            sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+                            sqlModel->select();
+                        }
+                    else
+                        QMessageBox::information(this,QString("Informacja"),QString("Grupa już wyszła."));
+                }
+                else
+                    QMessageBox::information(this,QString("Informacja"),QString("Przycisk dotyczy grupy a nie osoby."));
+            }
+            else
+                QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
+    }
+    else
+        QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+}
 
 void MainWindow::on_sigmaButton_clicked()
 {
-    static bool isSigma = false;
-    isSigma = !isSigma;
+     if(!sqlModel->isDirty()) {
+         ui->sigmaButton->setIconSize(QSize(35,35));
+         ui->sigmaButton->setStyleSheet("QPushButton {"
+                                            "color: white;"
+                                            "border-left: 2px solid rgb(20,20,20);"
+                                            "border-top: 2px solid rgb(20,20,20);"
+                                            "border-bottom: 2px solid rgb(20,20,20);"
+                                            "background: rgb(35,35,35);"
+                                            "border-bottom-left-radius: 5px;"
+                                            "border-top-left-radius:5px;}"
+                                            "QPushButton:pressed {"
+                                            "color: white;"
+                                            "border-left: 2px solid rgb(20,20,20);"
+                                            "border-top: 2px solid rgb(20,20,20);"
+                                            "border-bottom: 2px solid rgb(20,20,20);"
+                                            "border-bottom-left-radius: 5px;"
+                                            "border-top-left-radius:5px;"
+                                            "background: rgb(80,80,80);}");
 
-    if(isSigma)
-        ui->sigmaButton->setIcon(QIcon(":/images/images/onlySigma.png"));
-    if(!isSigma)
-        ui->sigmaButton->setIcon(QIcon(":/images/images/onlySigmaChecked.png"));
+         ui->othersButton->setIconSize(QSize(16,16));
+         ui->othersButton->setStyleSheet("QPushButton {"
+                                            "color: white;"
+                                            "border-right: 2px solid rgb(20,20,20);"
+                                            "border-top: 2px solid rgb(20,20,20);"
+                                            "border-bottom: 2px solid rgb(20,20,20);"
+                                            "background:  qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                                             "stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));"
+                                            "border-bottom-right-radius: 5px;"
+                                            "border-top-right-radius:5px;}"
+                                            "QPushButton:pressed {"
+                                            "color: white;"
+                                            "border-right: 2px solid rgb(20,20,20);"
+                                            "border-top: 2px solid rgb(20,20,20);"
+                                            "border-bottom: 2px solid rgb(20,20,20);"
+                                            "border-bottom-right-radius: 5px;"
+                                            "border-top-right-radius:5px;"
+                                            "background: rgb(80,80,80);}");
+
+         sqlModel->setFilter("DepartureTime IS NULL");
+         sqlModel->select();
+         ui->tableView->scrollToBottom();
+     }
+     else QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
 }
+
+void MainWindow::on_othersButton_clicked()
+{
+    if(!sqlModel->isDirty()) {
+        ui->othersButton->setIconSize(QSize(35,35));
+        ui->othersButton->setStyleSheet("QPushButton {"
+                                           "color: white;"
+                                           "border-right: 2px solid rgb(20,20,20);"
+                                           "border-top: 2px solid rgb(20,20,20);"
+                                           "border-bottom: 2px solid rgb(20,20,20);"
+                                           "background: rgb(35,35,35);"
+                                           "border-bottom-right-radius: 5px;"
+                                           "border-top-right-radius:5px;}"
+                                           "QPushButton:pressed {"
+                                           "color: white;"
+                                           "border-right: 2px solid rgb(20,20,20);"
+                                           "border-top: 2px solid rgb(20,20,20);"
+                                           "border-bottom: 2px solid rgb(20,20,20);"
+                                           "border-bottom-right-radius: 5px;"
+                                           "border-top-right-radius:5px;"
+                                           "background: rgb(80,80,80);}");
+
+        ui->sigmaButton->setIconSize(QSize(16,16));
+        ui->sigmaButton->setStyleSheet("QPushButton {"
+                                           "color: white;"
+                                           "border-left: 2px solid rgb(20,20,20);"
+                                           "border-top: 2px solid rgb(20,20,20);"
+                                           "border-bottom: 2px solid rgb(20,20,20);"
+                                           "background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                                            "stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));"
+                                           "border-bottom-left-radius: 5px;"
+                                           "border-top-left-radius:5px;}"
+                                           "QPushButton:pressed {"
+                                           "color: white;"
+                                           "border-left: 2px solid rgb(20,20,20);"
+                                           "border-top: 2px solid rgb(20,20,20);"
+                                           "border-bottom: 2px solid rgb(20,20,20);"
+                                           "border-bottom-left-radius: 5px;"
+                                           "border-top-left-radius:5px;"
+                                           "background: rgb(80,80,80);}");
+
+        sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+        sqlModel->select();
+        ui->tableView->scrollToBottom();
+    }
+    else QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+
+}
+
+

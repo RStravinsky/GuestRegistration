@@ -23,8 +23,14 @@ bool LoginDialog::connectToDatabase(QString &login,QString &password)
     sqlDatabase = QSqlDatabase::addDatabase("QMYSQL");
     sqlDatabase.setHostName("192.168.1.7");
     sqlDatabase.setDatabaseName("guestregistration");
-    sqlDatabase.setUserName(login);
-    sqlDatabase.setPassword(password);
+    if(login.isEmpty() && password.isEmpty()) {
+        sqlDatabase.setUserName("sigmasa");
+        sqlDatabase.setPassword("sigmasa");
+    }
+    else {
+        sqlDatabase.setUserName(login);
+        sqlDatabase.setPassword(password);
+    }
 
     if (!sqlDatabase.open()) return false;
     else return true;

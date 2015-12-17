@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlTableModel>
 #include <QColor>
+#include <QDebug>
 
 class ModSqlTableModel : public QSqlTableModel
 {
@@ -12,10 +13,11 @@ public:
     explicit ModSqlTableModel(QObject *parent = 0, QSqlDatabase db = QSqlDatabase()) : QSqlTableModel(parent, db) {}
     Qt::ItemFlags flags ( const QModelIndex & index ) const;
     QVariant data(const QModelIndex &idx, int role) const;
+    static bool isGroup;
 
 signals:
 
-public slots:
+private slots:
 
 private:
 

@@ -30,7 +30,6 @@ private slots:
     void on_dateClicked(QDate date);
     void on_exportButton_clicked();
     void on_pathButton_clicked();
-
     void on_categoriesComboBox_currentIndexChanged(const QString &arg1);
 
 private:

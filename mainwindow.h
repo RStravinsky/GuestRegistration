@@ -41,22 +41,23 @@ private slots:
     void on_deleteButton_clicked();
     void on_timer_overflow();
     void on_lineEdit_textChanged(const QString &arg1);
-
     void on_sigmaButton_clicked();
+    void on_othersButton_clicked();
+    void on_addGroupButton_clicked();
+    void on_deleteGroup_clicked();
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
 
 private:
     Ui::MainWindow *ui;
-    bool isAdded{false};
     QLabel * Statlabel;
     QProgressBar *Statprogress;
     ModSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
     QTimer *timer;
-    bool isConnectedToNetwork();
 
+    bool isConnectedToNetwork();
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent* event);
     void addStatusBar();

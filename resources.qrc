@@ -19,5 +19,9 @@
         <file>images/rightArrow.png</file>
         <file>images/onlySigmaChecked.png</file>
         <file>images/onlySigma.png</file>
+        <file>images/isSigma.png</file>
+        <file>images/person.png</file>
+        <file>images/add_group.png</file>
+        <file>images/delete_group.png</file>
     </qresource>
 </RCC>
