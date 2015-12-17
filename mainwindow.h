@@ -47,20 +47,32 @@ private slots:
     void on_othersButton_clicked();
     void on_addGroupButton_clicked();
     void on_deleteGroup_clicked();
-
     void setIcon();
-    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);   
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
 
 private:
+
+    enum class ButtonStyle{
+        Normal,
+        Submit,
+        Remove,
+        SwitchRightON,
+        SwitchRightOFF,
+        SwitchLeftON,
+        SwitchLeftOFF
+    };
+
     Ui::MainWindow *ui;
     QLabel * Statlabel;
     QProgressBar *Statprogress;
     ModSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
     QTimer *timer;
+    bool addPersonState{false};
+    bool addGroupState{false};
 
     QSystemTrayIcon * trayIcon;
     QAction *minimizeAction;
@@ -81,6 +93,9 @@ private:
     void configureTable();
     bool submit(ModSqlTableModel *&model);
     bool dataIsCorrect();
+    QString setButtonsStyleSheet(ButtonStyle style);
+
+
 };
 
 #endif // MAINWINDOW_H
