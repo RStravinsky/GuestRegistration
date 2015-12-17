@@ -29,7 +29,7 @@ QVariant ModSqlTableModel::data(const QModelIndex &idx, int role) const
     QVariant v = QSqlTableModel::data(idx, role);
 
     if ((role == Qt::BackgroundRole) && (index(idx.row(), 7, idx.parent()).data().toString().isEmpty()))
-        return QVariant(QColor(5,88,86));
+         return QVariant(QColor(5,88,86));
 
     return (v);
 }

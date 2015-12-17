@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <QtNetwork/QNetworkInterface>
 #include <QHeaderView>
+#include <QSystemTrayIcon>
 #include <qspreadsheetheaderview.h>
 #include "logindialog.h"
 #include "modsqltablemodel.h"
@@ -33,6 +34,7 @@ public:
     ~MainWindow();
     static int const EXIT_CODE_REBOOT=-123456789;
     void loadSqlModel();
+    void setVisible(bool visible) Q_DECL_OVERRIDE;
 
 private slots:
     void on_sendAccess(QString login,QString password);
@@ -46,6 +48,9 @@ private slots:
     void on_addGroupButton_clicked();
     void on_deleteGroup_clicked();
 
+    void setIcon();
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
 
@@ -56,6 +61,18 @@ private:
     ModSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
     QTimer *timer;
+
+    QSystemTrayIcon * trayIcon;
+    QAction *minimizeAction;
+    QAction *maximizeAction;
+    QAction *restoreAction;
+    QAction *quitAction;
+    QMenu *trayIconMenu;
+    void createActions();
+    void createTrayIcon();
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+    void showMessage();
+    void setPopupMessage();
 
     bool isConnectedToNetwork();
     bool eventFilter(QObject *obj, QEvent *event);
