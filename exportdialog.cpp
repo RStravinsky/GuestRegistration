@@ -73,7 +73,7 @@ void ExportDialog::on_exportButton_clicked()
     if(startDate > stopDate )
                 QMessageBox::information(this,QString("Informacja"),QString("Data końcowa jest większa niż data początkowa."));
     else {
-        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '"+stopDate.toString("yyyy-MM-dd")+"'");
+        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '2015-12-16'");
         populatePDF();
         ExportDialog::accept();
     }
@@ -89,43 +89,97 @@ void ExportDialog::on_pathButton_clicked()
     ui->pathLineEdit->setText(pdfFile);
 }
 
-QTextTableFormat ExportDialog::tableFormat()
+QTextTableFormat ExportDialog::tableFormat(TabFormat format)
 {
-    QTextTableFormat tableFormat;
-    tableFormat.setAlignment(Qt::AlignCenter);
-    tableFormat.setCellSpacing(0);
-    tableFormat.setCellPadding(3);
-    tableFormat.setTopMargin(10);
-    tableFormat.setBottomMargin(10);
-    tableFormat.setBorderBrush(Qt::black);
+    if(format == TabFormat::Table) {
 
-    QVector<QTextLength> widths;
-    widths << QTextLength(QTextLength::PercentageLength, 2) << QTextLength(QTextLength::PercentageLength, 14) << QTextLength(QTextLength::PercentageLength, 15)
-           << QTextLength(QTextLength::PercentageLength, 9) << QTextLength(QTextLength::PercentageLength, 8) << QTextLength(QTextLength::PercentageLength, 10)
-           << QTextLength(QTextLength::PercentageLength, 18) << QTextLength(QTextLength::PercentageLength, 24);
+        QTextTableFormat tableFormat;
+        tableFormat.setAlignment(Qt::AlignCenter);
+        tableFormat.setCellSpacing(0);
+        tableFormat.setCellPadding(3);
+        tableFormat.setTopMargin(10);
+        tableFormat.setBottomMargin(10);
+        tableFormat.setBorderBrush(Qt::black);
 
-    tableFormat.setColumnWidthConstraints(widths);
-    return tableFormat;
+        QVector<QTextLength> widths;
+        widths << QTextLength(QTextLength::PercentageLength, 4) << QTextLength(QTextLength::PercentageLength, 14) << QTextLength(QTextLength::PercentageLength, 15)
+               << QTextLength(QTextLength::PercentageLength, 7) << QTextLength(QTextLength::PercentageLength, 8) << QTextLength(QTextLength::PercentageLength, 10)
+               << QTextLength(QTextLength::PercentageLength, 18) << QTextLength(QTextLength::PercentageLength, 24);
+
+        tableFormat.setColumnWidthConstraints(widths);
+        return tableFormat;
+
+    }
+
+    if(format == TabFormat::Header) {
+
+        QTextTableFormat tableFormat;
+        tableFormat.setAlignment(Qt::AlignCenter);
+        tableFormat.setCellSpacing(0);
+        tableFormat.setCellPadding(3);
+        tableFormat.setTopMargin(10);
+        tableFormat.setBottomMargin(0);
+        tableFormat.setBorder(0);
+
+
+        QVector<QTextLength> widths;
+        widths << QTextLength(QTextLength::PercentageLength, 10) << QTextLength(QTextLength::PercentageLength, 45) << QTextLength(QTextLength::PercentageLength, 45);
+
+        tableFormat.setColumnWidthConstraints(widths);
+        return tableFormat;
+    }
+
+
 }
 
-void ExportDialog::addHeaderToDocument(QTextCursor *cursor, QString &title)
+void ExportDialog::addHeaderToDocument(QTextDocument *document,QTextCursor *cursor)
 {
+    QImage logoImage(":/images/images/sigma.png");
+    document->addResource(QTextDocument::ImageResource, QUrl(":/images/images/sigma.png"), logoImage);
+
+    QTextTable *headerTable = cursor->insertTable(1, 3, tableFormat(TabFormat::Header));
+    //headerTable->mergeCells(1,0,1,3);
+
     QTextBlockFormat blockFormat;
-    blockFormat.setAlignment(Qt::AlignLeft);
-    blockFormat.setTopMargin(0);
-    //cursor->insertBlock(blockFormat);
-    //cursor->insertImage(":/images/images/sigma.png");
-    //blockFormat.setLeftMargin(40);
+    QTextImageFormat logoFormat;
+    logoFormat.setName(":/images/images/sigma.png");
+    logoFormat.setWidth(40);
+
+    headerTable->cellAt(0,0).firstCursorPosition();
+
+    blockFormat.setAlignment(Qt::AlignBottom);
+    cursor->insertBlock(blockFormat);
+    cursor->insertImage(logoFormat);
+
+
+    cursor->movePosition(QTextCursor::NextCell);
+    blockFormat.setAlignment(Qt::AlignRight);
+    cursor->insertBlock(blockFormat);
     QTextCharFormat charFormat;
-    charFormat.setFont(QFont("Calibri", 9, QFont::Bold));
-    cursor->insertText(title, charFormat);
+    charFormat.setFont(QFont("Calibri", 12, QFont::Bold));
+    cursor->insertText("RAPORT EWIDENCJI GOŚCI", charFormat);
+
+    QString headerText = "Wygenerowano: " + QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss");
+
+    cursor->movePosition(QTextCursor::NextCell);
+    blockFormat.setAlignment(Qt::AlignRight);
+    cursor->insertBlock(blockFormat);
+    QTextCharFormat charFormat2;
+    charFormat2.setFont(QFont("Calibri", 9));
+    cursor->insertText(headerText, charFormat2);
+
 }
 
 void ExportDialog::populateTable(QTextCursor *cursor)
 {
+    QTextDocument tableDocument;
+    QTextCursor tableDocumentCursor(&tableDocument);
+
     QTextCursor tableCursor;
     QTextBlockFormat blockFormat;
-    QTextTable *table = cursor->insertTable(sqlModel->rowCount() + 1, sqlModel->columnCount(), tableFormat());
+    cursor->insertHtml("<hr>");
+
+    QTextTable *table = tableDocumentCursor.insertTable(sqlModel->rowCount() + 1, sqlModel->columnCount(), tableFormat(TabFormat::Table));
 
     QStringList headerList ({"L.p.","Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
 
@@ -161,6 +215,8 @@ void ExportDialog::populateTable(QTextCursor *cursor)
             }
         }
     }
+
+    cursor->insertFragment(QTextDocumentFragment(&tableDocument));
 }
 
 void ExportDialog::populatePDF()
@@ -168,9 +224,10 @@ void ExportDialog::populatePDF()
     QTextDocument document;
     document.setDefaultFont(QFont("Calibri", 9));
     QTextCursor textCursor(&document);
-    QString headerText = "Wygenerowano: " + QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss");
 
-    addHeaderToDocument(&textCursor, headerText);
+    addHeaderToDocument(&document,&textCursor);
+    textCursor.movePosition(QTextCursor::NextRow);
+    textCursor.movePosition(QTextCursor::NextBlock);
     populateTable(&textCursor);
 
     QPrinter printer(QPrinter::HighResolution);

@@ -12,6 +12,7 @@
 #include <QPrinter>
 #include <QtPrintSupport>
 #include <QDesktopServices>
+#include <QSqlQuery>
 #include <modsqltablemodel.h>
 
 namespace Ui {
@@ -38,10 +39,17 @@ private:
     ModSqlTableModel * sqlModel;
     void naviBarColor(QCalendarWidget *& calendarWidget);
 
+    enum TabFormat
+    {
+        Header = 0,
+        Table = 1
+    };
+
     void populatePDF();
-    QTextTableFormat tableFormat();
-    void addHeaderToDocument(QTextCursor *cursor, QString &title);
+    QTextTableFormat tableFormat( TabFormat format);
+    void addHeaderToDocument(QTextDocument *document, QTextCursor *cursor);
     void populateTable(QTextCursor *cursor);
+
 };
 
 #endif // EXPORTDIALOG_H
