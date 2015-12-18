@@ -120,12 +120,16 @@ void MainWindow::on_sendAccess(QString login,QString password)
    Statprogress->setValue(100);
    if((login=="root" && password=="Serwis4q@") || (login=="solid" && password=="solidsigmasa")) {
        ui->addButton->setVisible(true);
+       ui->addGroupButton->setVisible(true);
        ui->deleteButton->setVisible(true);
+       ui->deleteGroup->setVisible(true);
    }
    else {
        login = QString("sigmasa");
        ui->addButton->setVisible(false);
        ui->deleteButton->setVisible(false);
+       ui->addGroupButton->setVisible(false);
+       ui->deleteGroup->setVisible(false);
    }
    Statlabel->setText("<font color='white'>Połączono z użytkownikiem: <b><font color='green'>"+login+"</font></b></font>");
 }
@@ -139,6 +143,12 @@ void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
         ExportDialog exportDialog(this);
         exportDialog.exec();
     }
+
+    if( mainButton == ui->helpButton ) {
+        HelpDialog helpDialog(this);
+        helpDialog.exec();
+    }
+
 }
 
 void MainWindow::on_timer_overflow()
@@ -481,16 +491,19 @@ void MainWindow::on_othersButton_clicked()
 
 void MainWindow::setIcon()
 {
-    trayIcon->setIcon(QIcon(":/images/images/loginIcon.ico"));
+    trayIcon->setIcon(QIcon(":/images/images/icon.ico"));
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
     case QSystemTrayIcon::Trigger:
+            break;
     case QSystemTrayIcon::DoubleClick:
+            dcAction->activate(QAction::Trigger);
+            break;
     case QSystemTrayIcon::MiddleClick:
-        break;
+            break;
     default:
         ;
     }
@@ -499,12 +512,15 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::createActions()
 {
     minimizeAction = new QAction(tr("Mi&nimalizuj"), this);
+    minimizeAction->setFont(QFont("Segou UI", 9));
     connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
 
     restoreAction = new QAction(tr("&Przywróć"), this);
+    restoreAction->setFont(QFont("Segou UI", 9));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(show()));
 
     quitAction = new QAction(tr("&Zamknij"), this);
+    quitAction->setFont(QFont("Segou UI", 9));
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 }
 
@@ -528,15 +544,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (trayIcon->isVisible()) {
 
         QMessageBox msgBox(QMessageBox::Question, tr("Ewidencja gości"), tr("Czy chcesz zminimalizować program do paska zadań?"), QMessageBox::Yes | QMessageBox::No );
-
         msgBox.setWindowIcon(QIcon(":/images/images/icon.ico"));
         msgBox.setButtonText(QMessageBox::Yes, tr("Tak"));
         msgBox.setButtonText(QMessageBox::No, tr("Nie"));
-
         if (msgBox.exec() == QMessageBox::No) {
             QApplication::quit();
         }
-
         hide();
         event->ignore();
     }
@@ -552,24 +565,43 @@ void MainWindow::showMessage()
 
 void MainWindow::setPopupMessage()
 {
-        QString title = "Nowa osoba w firmie:";
 
+    QString firstCell = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
+    if(firstCell!=QString("-----")) {
+
+        QString title = "Nowa osoba w firmie:";
         QString company = sqlModel->index(sqlModel->rowCount()-1,3).data().toString();
         QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
         QString surname = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
-
         QString msg;
         if(company.isEmpty())
             msg = name + " " + surname;
         else
             msg = name + " " + surname + ", " + company;
 
-        trayIcon->showMessage(title, msg, QSystemTrayIcon::Information, 5000);
-}
+        trayIcon->showMessage(title, msg, QSystemTrayIcon::Information, 10000);
 
+    }
+    else {
+
+        QString title = "Nowa grupa w firmie:";
+        trayIcon->showMessage(title, sqlModel->index(sqlModel->rowCount()-1,3).data().toString(), QSystemTrayIcon::Information, 10000);
+    }
+}
 void MainWindow::setVisible(bool visible)
 {
     minimizeAction->setEnabled(visible);
-    restoreAction->setEnabled(isMaximized() || !visible);
+    restoreAction->setEnabled(!visible);
     QMainWindow::setVisible(visible);
+
+    if(visible) {
+        dcAction = minimizeAction;
+        minimizeAction->setFont(QFont("Segou UI", 9, QFont::Bold));
+        restoreAction->setFont(QFont("Segou UI", 9));
+    }
+    else {
+        dcAction = restoreAction;
+        restoreAction->setFont(QFont("Segou UI", 9, QFont::Bold));
+        minimizeAction->setFont(QFont("Segou UI", 9));
+    }
 }

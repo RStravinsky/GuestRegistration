@@ -19,17 +19,20 @@ SOURCES += main.cpp\
     logindialog.cpp \
     modsqltablemodel.cpp \
     qspreadsheetheaderview.cpp \
-    exportdialog.cpp
+    exportdialog.cpp \
+    helpdialog.cpp
 
 HEADERS  += mainwindow.h \
     logindialog.h \
     modsqltablemodel.h \
     qspreadsheetheaderview.h \
-    exportdialog.h
+    exportdialog.h \
+    helpdialog.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \
-    exportdialog.ui
+    exportdialog.ui \
+    helpdialog.ui
 
 RESOURCES += \
     resources.qrc

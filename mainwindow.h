@@ -20,6 +20,7 @@
 #include <qspreadsheetheaderview.h>
 #include "logindialog.h"
 #include "modsqltablemodel.h"
+#include "helpdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -67,6 +68,7 @@ private:
     QAction *maximizeAction;
     QAction *restoreAction;
     QAction *quitAction;
+    QAction *dcAction;
     QMenu *trayIconMenu;
     void createActions();
     void createTrayIcon();
