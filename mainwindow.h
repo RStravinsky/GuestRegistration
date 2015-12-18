@@ -36,6 +36,7 @@ public:
     static int const EXIT_CODE_REBOOT=-123456789;
     void loadSqlModel();
     void setVisible(bool visible) Q_DECL_OVERRIDE;
+    void showTrayIcon();
 
 private slots:
     void on_sendAccess(QString login,QString password);
@@ -87,6 +88,7 @@ private:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
     void showMessage();
     void setPopupMessage();
+    void loadTrayIcon();
 
     bool isConnectedToNetwork();
     bool eventFilter(QObject *obj, QEvent *event);

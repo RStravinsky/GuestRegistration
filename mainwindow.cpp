@@ -14,17 +14,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->helpButton->installEventFilter(this);
     ui->generateButton->installEventFilter(this);
 
-    createActions();
-    createTrayIcon();
-
     connect(this,SIGNAL(mainButtonReleased(const QPushButton*)),this,SLOT(on_mainButtonReleased(const QPushButton*)));
-
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
-
-    setIcon();
-    trayIcon->show();
-
     timer = new QTimer(this);
+
+    loadTrayIcon();
 }
 
 MainWindow::~MainWindow()
@@ -152,16 +145,7 @@ void MainWindow::on_timer_overflow()
         QMessageBox::critical(this,QString("Błąd"),QString("Połaczenie z bazą danych zostało przerwane!\nNastąpi przejście do okna logowania."));
         qApp->exit( MainWindow::EXIT_CODE_REBOOT );
     }
-
-    if(Statlabel->text().contains("sigmasa")) {
-        int actualRowCount = sqlModel->rowCount();
-        sqlModel->select();
-        if( sqlModel->rowCount() > actualRowCount && (!sqlModel->isDirty()) ) {
-            actualRowCount = sqlModel->rowCount();
-            setPopupMessage();
-        }
-    }
-
+    setPopupMessage();
     timer->start(5000);
 }
 
@@ -548,6 +532,13 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::createActions()
 {
+    QBrush wBrush;
+    wBrush.setColor(Qt::white);
+    QFont wFont;
+    wFont.setFamily("Segou UI");
+    wFont.setPointSize(9);
+
+
     minimizeAction = new QAction(tr("Mi&nimalizuj"), this);
     minimizeAction->setFont(QFont("Segou UI", 9));
     connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
@@ -564,6 +555,7 @@ void MainWindow::createActions()
 void MainWindow::createTrayIcon()
 {
     trayIconMenu = new QMenu(this);
+    trayIconMenu->setStyleSheet("QMenu {background: rgb(200,200,200);}");
     minimizeAction->setIcon(QIcon(":/images/images/minimize.png"));
     trayIconMenu->addAction(minimizeAction);
     restoreAction->setIcon(QIcon(":/images/images/restore.png"));
@@ -580,7 +572,37 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (trayIcon->isVisible()) {
 
-        QMessageBox msgBox(QMessageBox::Question, tr("Ewidencja gości"), tr("Czy chcesz zminimalizować program do paska zadań?"), QMessageBox::Yes | QMessageBox::No );
+        QMessageBox msgBox(QMessageBox::Question, tr("Ewidencja gości"), tr("<font face=""Calibri Light"" size=""5"" color=""white""><b>Czy chcesz zminimalizować program do paska zadań?</b></font>"), QMessageBox::Yes | QMessageBox::No );
+
+        msgBox.setStyleSheet("QMessageBox {background: black;}"
+                             "QPushButton {"
+                             "color: gray;"
+                             "border: 2px solid rgb(20,20,20);"
+                             "border-radius: 5px;"
+                             "background: rgb(35,35,35);"
+                             "width: 100;"
+                             "height: 40;"
+                             "font-family: Calibri Light;"
+                             "font-size: 12;"
+                             "font-weight: bold;"
+                             "}"
+                             "QPushButton:hover {"
+                             "color: white;"
+                             "border: 2px solid rgb(20,20,20);"
+                             "border-radius: 5px;"
+                             "background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                                "stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));"
+                             "}"
+                             "QPushButton:pressed {"
+                             "color: white;"
+                             "border: 2px solid rgb(20,20,20);"
+                             "border-radius: 5px;"
+                             "background: rgb(80,80,80);"
+                             "}"
+
+                             );
+
+        msgBox.setWindowFlags(Qt::FramelessWindowHint);
         msgBox.setWindowIcon(QIcon(":/images/images/icon.ico"));
         msgBox.setButtonText(QMessageBox::Yes, tr("Tak"));
         msgBox.setButtonText(QMessageBox::No, tr("Nie"));
@@ -603,26 +625,34 @@ void MainWindow::showMessage()
 void MainWindow::setPopupMessage()
 {
 
-    QString firstCell = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
-    if(firstCell!=QString("-----")) {
+    if(Statlabel->text().contains("sigmasa")) {
+        int actualRowCount = sqlModel->rowCount();
+        sqlModel->select();
+        if( sqlModel->rowCount() > actualRowCount && (!sqlModel->isDirty()) ) {
+            actualRowCount = sqlModel->rowCount();
 
-        QString title = "Nowa osoba w firmie:";
-        QString company = sqlModel->index(sqlModel->rowCount()-1,3).data().toString();
-        QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
-        QString surname = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
-        QString msg;
-        if(company.isEmpty())
-            msg = name + " " + surname;
-        else
-            msg = name + " " + surname + ", " + company;
+            QString firstCell = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
+            if(firstCell!=QString("-----")) {
 
-        trayIcon->showMessage(title, msg, QSystemTrayIcon::Information, 10000);
+                QString title = "Nowa osoba w firmie:";
+                QString company = sqlModel->index(sqlModel->rowCount()-1,3).data().toString();
+                QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
+                QString surname = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
+                QString msg;
+                if(company.isEmpty())
+                    msg = name + " " + surname;
+                else
+                    msg = name + " " + surname + ", " + company;
 
-    }
-    else {
+                trayIcon->showMessage(title, msg, QSystemTrayIcon::Information, 10000);
 
-        QString title = "Nowa grupa w firmie:";
-        trayIcon->showMessage(title, sqlModel->index(sqlModel->rowCount()-1,3).data().toString(), QSystemTrayIcon::Information, 10000);
+            }
+            else {
+
+                QString title = "Nowa grupa w firmie:";
+                trayIcon->showMessage(title, sqlModel->index(sqlModel->rowCount()-1,3).data().toString(), QSystemTrayIcon::Information, 10000);
+            }
+       }
     }
 }
 void MainWindow::setVisible(bool visible)
@@ -643,3 +673,16 @@ void MainWindow::setVisible(bool visible)
     }
 }
 
+void MainWindow::loadTrayIcon()
+{
+    createActions();
+    createTrayIcon();
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+    setIcon();
+
+}
+
+void MainWindow::showTrayIcon()
+{
+   trayIcon->show();
+}
