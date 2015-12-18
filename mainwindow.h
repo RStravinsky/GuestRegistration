@@ -49,6 +49,7 @@ private slots:
     void on_deleteGroup_clicked();
     void setIcon();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);   
+    void on_editFinished(QWidget*,QAbstractItemDelegate::EndEditHint);
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);
@@ -71,8 +72,9 @@ private:
     ModSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
     QTimer *timer;
-    bool addPersonState{false};
-    bool addGroupState{false};
+    bool isPersonAdded{false};
+    bool isGroupAdded{false};
+    bool isSigmaFilter{false};
 
     QSystemTrayIcon * trayIcon;
     QAction *minimizeAction;

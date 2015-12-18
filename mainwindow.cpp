@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->logoutButton->installEventFilter(this);
     ui->helpButton->installEventFilter(this);
     ui->generateButton->installEventFilter(this);
+    ui->tableView->installEventFilter(this);
 
     createActions();
     createTrayIcon();
@@ -76,7 +77,7 @@ void MainWindow::loadSqlModel()
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
-{
+{      
     QPushButton * actualButton = qobject_cast<QPushButton *>(obj);
 
     if (event->type() == QEvent::HoverEnter) {
@@ -98,6 +99,18 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         actualButton->setIconSize(QSize(80, 80));
         return true;
     }
+
+//    if (event->type() == QEvent::KeyPress)
+//       {
+//        if(obj == (QObject*)ui->tableView)
+//           {
+//               QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+//               if(keyEvent->key() == Qt::Key_Return)
+//               {
+
+//               }
+//           }
+//       }
 
     return false;
 }
@@ -147,14 +160,9 @@ void MainWindow::on_timer_overflow()
         qApp->exit( MainWindow::EXIT_CODE_REBOOT );
     }
 
-    if(Statlabel->text().contains("sigmasa")) {
-        int actualRowCount = sqlModel->rowCount();
-        sqlModel->select();
-        if( sqlModel->rowCount() > actualRowCount && (!sqlModel->isDirty()) ) {
-            actualRowCount = sqlModel->rowCount();
+    if(Statlabel->text().contains("sigmasa"))
             setPopupMessage();
-        }
-    }
+
 
     timer->start(5000);
 }
@@ -303,23 +311,30 @@ QString MainWindow::setButtonsStyleSheet(ButtonStyle style)
 
 bool MainWindow::dataIsCorrect()
 {
-    if(ModSqlTableModel::isGroup == true)
+    if(ModSqlTableModel::isGroup == true) {
+        if(sqlModel->index(sqlModel->rowCount()-1,3).data().toString().isEmpty()) {
+            QMessageBox::information(this,QString("Informacja"),QString("Nie dodano grupy.\nPrzyczyna: Firma musi być uzupełniona."));
+            return false;
+        }
         return true;
-
-    QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
-    QString surename = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
-
-    if(sqlModel->index(sqlModel->rowCount()-1,1).data().toString().isEmpty() ||
-       sqlModel->index(sqlModel->rowCount()-1,2).data().toString().isEmpty()) {
-        QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię oraz nazwisko musi być uzupełnione."));
-        return false;
     }
-    if(name.contains(" ") || surename.contains(" ")) {
-         QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię lub nazwisko zawiera pusty znak (\" \")."));
-         return false;
 
+    else {
+        QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
+        QString surename = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
+
+        if(sqlModel->index(sqlModel->rowCount()-1,1).data().toString().isEmpty() ||
+           sqlModel->index(sqlModel->rowCount()-1,2).data().toString().isEmpty()) {
+            QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię oraz nazwisko musi być uzupełnione."));
+            return false;
+        }
+        if(name.contains(" ") || surename.contains(" ")) {
+             QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię lub nazwisko zawiera pusty znak (\" \")."));
+             return false;
+
+        }
+        return true;
     }
-    return true;
 }
 
 bool MainWindow::submit(ModSqlTableModel *&model)
@@ -341,8 +356,8 @@ bool MainWindow::submit(ModSqlTableModel *&model)
                 QMessageBox::information(this,"Informacja","Dodano grupę.");
                 ModSqlTableModel::isGroup = false;
             }
-            model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
-            ui->othersButton->click();
+            if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
+            else model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
             model->select();
             return true;
         }
@@ -353,11 +368,11 @@ bool MainWindow::submit(ModSqlTableModel *&model)
 
 void MainWindow::on_addButton_clicked()
 {
-    if(!addPersonState) {
+    if(!isPersonAdded) {
         if(!sqlModel->isDirty()) {
             if(sqlModel->insertRow(sqlModel->rowCount())) {
                 ui->tableView->scrollToBottom();
-                addPersonState = !addPersonState;
+                isPersonAdded = !isPersonAdded;
                 ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
                 ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Submit));
                 ui->deleteButton->setIcon(QIcon(":/images/images/remove.png"));
@@ -371,7 +386,7 @@ void MainWindow::on_addButton_clicked()
     }
     else {
         if(submit(sqlModel)) {
-        addPersonState = !addPersonState;
+        isPersonAdded = !isPersonAdded;
         ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
         ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
         ui->deleteButton->setIcon(QIcon(":/images/images/delete_person.png"));
@@ -395,8 +410,8 @@ void MainWindow::on_deleteButton_clicked()
                                 QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
                                 return;
                             }
-                            sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
-                            ui->othersButton->click();
+                            if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
+                            else sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
                             sqlModel->select();
                             }
                     else
@@ -408,9 +423,9 @@ void MainWindow::on_deleteButton_clicked()
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
     }
-    else if(!addGroupState){
+    else if(!isGroupAdded){
         sqlModel->select();
-        addPersonState = !addPersonState;
+        isPersonAdded = !isPersonAdded;
         ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
         ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
         ui->deleteButton->setIcon(QIcon(":/images/images/delete_person.png"));
@@ -422,11 +437,11 @@ void MainWindow::on_deleteButton_clicked()
 
 void MainWindow::on_addGroupButton_clicked()
 {
-        if(!addGroupState) {
+        if(!isGroupAdded) {
             if(!sqlModel->isDirty()) {
                 if(sqlModel->insertRow(sqlModel->rowCount())) {
                     ui->tableView->scrollToBottom();
-                    addGroupState = !addGroupState;
+                    isGroupAdded = !isGroupAdded;
                     ui->addGroupButton->setIcon(QIcon(":/images/images/submit.png"));
                     ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Submit));
                     ui->deleteGroup->setIcon(QIcon(":/images/images/remove.png"));
@@ -444,7 +459,7 @@ void MainWindow::on_addGroupButton_clicked()
         }
         else {
             if(submit(sqlModel)) {
-            addGroupState = !addGroupState;
+            isGroupAdded = !isGroupAdded;
             ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
             ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
             ui->deleteGroup->setIcon(QIcon(":/images/images/delete_group.png"));
@@ -468,7 +483,8 @@ void MainWindow::on_deleteGroup_clicked()
                                 QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
                                 return;
                             }
-                            sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+                            if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
+                            else sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
                             sqlModel->select();
                         }
                     else
@@ -480,9 +496,10 @@ void MainWindow::on_deleteGroup_clicked()
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
     }
-    else if(!addPersonState){
+    else if(!isPersonAdded){
         sqlModel->select();
-        addGroupState = !addGroupState;
+        isGroupAdded = !isGroupAdded;
+        ModSqlTableModel::isGroup = false;
         ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
         ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
         ui->deleteGroup->setIcon(QIcon(":/images/images/delete_group.png"));
@@ -495,6 +512,7 @@ void MainWindow::on_deleteGroup_clicked()
 void MainWindow::on_sigmaButton_clicked()
 {
      if(!sqlModel->isDirty()) {
+         isSigmaFilter = true;
          ui->sigmaButton->setIconSize(QSize(35,35));
          ui->sigmaButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchRightON));
          ui->othersButton->setIconSize(QSize(16,16));
@@ -509,6 +527,7 @@ void MainWindow::on_sigmaButton_clicked()
 void MainWindow::on_othersButton_clicked()
 {
     if(!sqlModel->isDirty()) {
+        isSigmaFilter = false;
         ui->othersButton->setIconSize(QSize(35,35));
         ui->othersButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchLeftON));
         ui->sigmaButton->setIconSize(QSize(16,16));
@@ -535,6 +554,11 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     default:
         ;
     }
+}
+
+void MainWindow::on_editFinished(QWidget *, QAbstractItemDelegate::EndEditHint)
+{
+  qDebug() << "KUPA" << endl;
 }
 
 void MainWindow::createActions()
@@ -593,6 +617,11 @@ void MainWindow::showMessage()
 
 void MainWindow::setPopupMessage()
 {
+    int actualRowCount = sqlModel->rowCount();
+    sqlModel->select();
+
+    if( sqlModel->rowCount() > actualRowCount && (!sqlModel->isDirty()) ) {
+        actualRowCount = sqlModel->rowCount();
         QString title = "Nowa osoba w firmie:";
 
         QString company = sqlModel->index(sqlModel->rowCount()-1,3).data().toString();
@@ -606,6 +635,7 @@ void MainWindow::setPopupMessage()
             msg = name + " " + surname + ", " + company;
 
         trayIcon->showMessage(title, msg, QSystemTrayIcon::Information, 5000);
+    }
 }
 
 void MainWindow::setVisible(bool visible)

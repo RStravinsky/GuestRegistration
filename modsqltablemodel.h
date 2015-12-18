@@ -5,6 +5,8 @@
 #include <QSqlTableModel>
 #include <QColor>
 #include <QDebug>
+#include <QPainter>
+#include <QIcon>
 
 class ModSqlTableModel : public QSqlTableModel
 {

@@ -28,8 +28,35 @@ QVariant ModSqlTableModel::data(const QModelIndex &idx, int role) const
 {
     QVariant v = QSqlTableModel::data(idx, role);
 
-    if ((role == Qt::BackgroundRole) && (index(idx.row(), 7, idx.parent()).data().toString().isEmpty()))
-         return QVariant(QColor(5,88,86));
+    if (role == Qt::BackgroundRole) {
+
+        if(isDirty() && !isGroup) {
+
+            QString name = index(idx.row(), 1, idx.parent()).data().toString();
+            QString surname = index(idx.row(), 2, idx.parent()).data().toString();
+            if((name.isEmpty() || name.contains(" ")) && idx.column() == 1 && idx.row() == rowCount()-1)
+                    return QVariant(QColor(10,158,155));
+            if((surname.isEmpty() || surname.contains(" ")) && idx.column() == 2 && idx.row() == rowCount()-1)
+                    return QVariant(QColor(10,158,155));
+            else if ((role == Qt::BackgroundRole) && index(idx.row(), 7, idx.parent()).data().toString().isEmpty())
+                    return QVariant(QColor(5,88,86));
+
+        }
+        else if (isDirty() && isGroup) {
+            QString company = index(idx.row(), 3, idx.parent()).data().toString();
+            if(company.isEmpty() && idx.column() == 3 && idx.row() == rowCount()-1)
+                return QVariant(QColor(10,158,155));
+            else if (index(idx.row(), 7, idx.parent()).data().toString().isEmpty()) {
+                return QVariant(QColor(5,88,86));
+            }
+
+        }
+
+        else if(!isDirty() && index(idx.row(), 7, idx.parent()).data().toString().isEmpty())
+                  return QVariant(QColor(5,88,86));
+    }
 
     return (v);
 }
+
+
