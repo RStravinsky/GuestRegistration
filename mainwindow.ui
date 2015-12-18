@@ -183,7 +183,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 }
 </string>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0" columnstretch="0,0,0,0,0,0,0,0,0,0,0,0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0" columnstretch="0,0,0,0,0,0,0,0,0,0,0">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -196,7 +196,475 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     <property name="horizontalSpacing">
      <number>3</number>
     </property>
-    <item row="0" column="0" colspan="12">
+    <item row="1" column="3">
+     <widget class="QPushButton" name="deleteButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Odjazd osoby</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:hover {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+QPushButton{
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/images/images/delete_person.png</normaloff>:/images/images/delete_person.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QPushButton" name="addGroupButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:hover {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+QPushButton{
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/images/images/add_group.png</normaloff>:/images/images/add_group.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="7">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri Light</family>
+        <pointsize>16</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="placeholderText">
+       <string>Szybkie wyszukiwanie</string>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QPushButton" name="addButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Przyjazd osoby</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:hover {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+QPushButton {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/images/images/add_person.png</normaloff>:/images/images/add_person.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6">
+     <widget class="QLabel" name="searchLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>38</width>
+        <height>38</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>41</width>
+        <height>38</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: &quot;transparent&quot;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/images/images/magnifier.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1" rowspan="2" colspan="9">
+     <widget class="QTableView" name="tableView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>16</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustIgnored</enum>
+      </property>
+      <property name="autoScroll">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>29</number>
+      </attribute>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QPushButton" name="deleteGroup">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:hover {
+color: gray;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(35,35,35);
+}
+
+QPushButton{
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
+}
+
+QPushButton:pressed {
+color: white;
+border: 2px solid rgb(20,20,20);
+border-radius: 5px;
+background: rgb(80,80,80);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/images/images/delete_group.png</normaloff>:/images/images/delete_group.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="8">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: none;</string>
+      </property>
+      <property name="title">
+       <string>GroupBox</string>
+      </property>
+      <widget class="QPushButton" name="sigmaButton">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>50</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+color: white;
+border-left: 2px solid rgb(20,20,20);
+border-top: 2px solid rgb(20,20,20);
+border-bottom: 2px solid rgb(20,20,20);
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+   stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));
+border-bottom-left-radius: 5px;
+border-top-left-radius:5px;
+}
+
+QPushButton:pressed {
+color: white;
+border-left: 2px solid rgb(20,20,20);
+border-top: 2px solid rgb(20,20,20);
+border-bottom: 2px solid rgb(20,20,20);
+border-bottom-left-radius: 5px;
+border-top-left-radius:5px;
+background: rgb(80,80,80);
+}
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/images/images/isSigma.png</normaloff>:/images/images/isSigma.png</iconset>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="othersButton">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>0</y>
+         <width>50</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+color: white;
+border-right: 2px solid rgb(20,20,20);
+border-top: 2px solid rgb(20,20,20);
+border-bottom: 2px solid rgb(20,20,20);
+background: rgb(35,35,35);
+border-bottom-right-radius: 5px;
+border-top-right-radius:5px;
+}
+
+QPushButton:pressed {
+color: white;
+border-right: 2px solid rgb(20,20,20);
+border-top: 2px solid rgb(20,20,20);
+border-bottom: 2px solid rgb(20,20,20);
+border-bottom-right-radius: 5px;
+border-top-right-radius:5px;
+background: rgb(80,80,80);
+}
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/images/images/person.png</normaloff>:/images/images/person.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>35</width>
+         <height>35</height>
+        </size>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="11">
      <widget class="QFrame" name="topFrame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -370,474 +838,6 @@ background: rgb(80,80,80);
         <bool>true</bool>
        </property>
       </widget>
-     </widget>
-    </item>
-    <item row="1" column="9">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: none;</string>
-      </property>
-      <property name="title">
-       <string>GroupBox</string>
-      </property>
-      <widget class="QPushButton" name="sigmaButton">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>50</width>
-         <height>50</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-color: white;
-border-left: 2px solid rgb(20,20,20);
-border-top: 2px solid rgb(20,20,20);
-border-bottom: 2px solid rgb(20,20,20);
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-   stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));
-border-bottom-left-radius: 5px;
-border-top-left-radius:5px;
-}
-
-QPushButton:pressed {
-color: white;
-border-left: 2px solid rgb(20,20,20);
-border-top: 2px solid rgb(20,20,20);
-border-bottom: 2px solid rgb(20,20,20);
-border-bottom-left-radius: 5px;
-border-top-left-radius:5px;
-background: rgb(80,80,80);
-}
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="resources.qrc">
-         <normaloff>:/images/images/isSigma.png</normaloff>:/images/images/isSigma.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="othersButton">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>0</y>
-         <width>50</width>
-         <height>50</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-color: white;
-border-right: 2px solid rgb(20,20,20);
-border-top: 2px solid rgb(20,20,20);
-border-bottom: 2px solid rgb(20,20,20);
-background: rgb(35,35,35);
-border-bottom-right-radius: 5px;
-border-top-right-radius:5px;
-}
-
-QPushButton:pressed {
-color: white;
-border-right: 2px solid rgb(20,20,20);
-border-top: 2px solid rgb(20,20,20);
-border-bottom: 2px solid rgb(20,20,20);
-border-bottom-right-radius: 5px;
-border-top-right-radius:5px;
-background: rgb(80,80,80);
-}
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="resources.qrc">
-         <normaloff>:/images/images/person.png</normaloff>:/images/images/person.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>35</width>
-         <height>35</height>
-        </size>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="1" column="5">
-     <widget class="QPushButton" name="addGroupButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton:hover {
-color: gray;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(35,35,35);
-}
-
-QPushButton{
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
-}
-
-QPushButton:pressed {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(80,80,80);
-}
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources.qrc">
-        <normaloff>:/images/images/add_group.png</normaloff>:/images/images/add_group.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="4">
-     <widget class="QPushButton" name="deleteButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>Odjazd osoby</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton:hover {
-color: gray;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(35,35,35);
-}
-
-QPushButton{
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
-}
-
-QPushButton:pressed {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(80,80,80);
-}
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources.qrc">
-        <normaloff>:/images/images/delete_person.png</normaloff>:/images/images/delete_person.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QPushButton" name="addButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>Przyjazd osoby</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton:hover {
-color: gray;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(35,35,35);
-}
-
-QPushButton {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
-}
-
-QPushButton:pressed {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(80,80,80);
-}
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources.qrc">
-        <normaloff>:/images/images/add_person.png</normaloff>:/images/images/add_person.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="7">
-     <widget class="QLabel" name="searchLabel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>38</width>
-        <height>38</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>41</width>
-        <height>38</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background: &quot;transparent&quot;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="resources.qrc">:/images/images/magnifier.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="8">
-     <widget class="QLineEdit" name="lineEdit">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>Calibri Light</family>
-        <pointsize>16</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="placeholderText">
-       <string>Szybkie wyszukiwanie</string>
-      </property>
-      <property name="clearButtonEnabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1" rowspan="2" colspan="10">
-     <widget class="QTableView" name="tableView">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>16</pointsize>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustIgnored</enum>
-      </property>
-      <property name="autoScroll">
-       <bool>true</bool>
-      </property>
-      <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>29</number>
-      </attribute>
-     </widget>
-    </item>
-    <item row="1" column="6">
-     <widget class="QPushButton" name="deleteGroup">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton:hover {
-color: gray;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(35,35,35);
-}
-
-QPushButton{
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-   stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));
-}
-
-QPushButton:pressed {
-color: white;
-border: 2px solid rgb(20,20,20);
-border-radius: 5px;
-background: rgb(80,80,80);
-}
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources.qrc">
-        <normaloff>:/images/images/delete_group.png</normaloff>:/images/images/delete_group.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>50</width>
-        <height>50</height>
-       </size>
-      </property>
      </widget>
     </item>
    </layout>

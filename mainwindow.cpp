@@ -40,7 +40,6 @@ bool MainWindow::isConnectedToNetwork(){
     bool result = false;
 
     for (int i = 0; i < ifaces.count(); i++) {
-
         QNetworkInterface iface = ifaces.at(i);
         if ( iface.flags().testFlag(QNetworkInterface::IsUp)
              && !iface.flags().testFlag(QNetworkInterface::IsLoopBack)) {
@@ -69,16 +68,12 @@ void MainWindow::loadSqlModel()
     proxyModel->setSourceModel(sqlModel);
     ui->tableView->setModel(proxyModel);
 
-    QSpreadsheetHeaderView * header = new QSpreadsheetHeaderView(Qt::Horizontal,this);
-    ui->tableView->setHorizontalHeader(header);
-    ui->tableView->show();
-
     configureTable();
+    ui->tableView->show();
 
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(on_timer_overflow()));
     timer->start(5000);
 }
-
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
@@ -157,6 +152,7 @@ void MainWindow::on_timer_overflow()
         QMessageBox::critical(this,QString("Błąd"),QString("Połaczenie z bazą danych zostało przerwane!\nNastąpi przejście do okna logowania."));
         qApp->exit( MainWindow::EXIT_CODE_REBOOT );
     }
+
     if(Statlabel->text().contains("sigmasa")) {
         int actualRowCount = sqlModel->rowCount();
         sqlModel->select();
@@ -198,20 +194,117 @@ void MainWindow::configureTable()
 {
     QFont Font("Calibri Light", 14, QFont::Light ,false);
 
-    ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->verticalHeader()->setFixedWidth(30);
+    QSpreadsheetHeaderView * header = new QSpreadsheetHeaderView(Qt::Horizontal,this);
+    ui->tableView->setHorizontalHeader(header);
     ui->tableView->horizontalHeader()->setFixedHeight(30);
-    ui->tableView->hideColumn(0);
     QStringList headerList ({"Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
     for(int i=1; i<sqlModel->columnCount(); ++i) {
         ui->tableView->setColumnWidth(i,266);
         sqlModel->setHeaderData(i, Qt::Horizontal, headerList.at(i-1));
     };
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-
     ui->tableView->horizontalHeader()->setFont(Font);
+    ui->tableView->horizontalHeader()->setVisible(true);
+
+    ui->tableView->verticalHeader()->setFixedWidth(30);
+    ui->tableView->hideColumn(0);
     ui->tableView->setFont(Font);
     ui->tableView->scrollToBottom();
+}
+
+QString MainWindow::setButtonsStyleSheet(ButtonStyle style)
+{
+    if(style == ButtonStyle::Submit)
+        return QString("QPushButton:hover {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
+                        "QPushButton {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
+                        "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                        "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
+    else if(style == ButtonStyle::Remove)
+        return QString("QPushButton:hover {color: gray;border: 3px solid rgb(164,46,46);border-radius: 5px;background: rgb(35,35,35);}"
+                       "QPushButton {color: white;border: 3px solid rgb(164,46,46);border-radius: 5px; background: qlineargradient"
+                       "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                       "QPushButton:pressed {color: white;border: 3px solid rgb(164,46,46);border-radius: 5px;background: rgb(80,80,80);}");
+    else if(style == ButtonStyle::Normal)
+        return QString("QPushButton:hover {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
+                       "QPushButton {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
+                       "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
+                       "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
+
+    else if(style == ButtonStyle::SwitchRightON)
+        return QString("QPushButton {"
+                       "color: white;"
+                       "border-left: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "background: rgb(35,35,35);"
+                       "border-bottom-left-radius: 5px;"
+                       "border-top-left-radius:5px;}"
+                       "QPushButton:pressed {"
+                       "color: white;"
+                       "border-left: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "border-bottom-left-radius: 5px;"
+                       "border-top-left-radius:5px;"
+                       "background: rgb(80,80,80);}");
+
+    else if(style == ButtonStyle::SwitchRightOFF)
+        return QString("QPushButton {"
+                       "color: white;"
+                       "border-left: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                        "stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));"
+                       "border-bottom-left-radius: 5px;"
+                       "border-top-left-radius:5px;}"
+                       "QPushButton:pressed {"
+                       "color: white;"
+                       "border-left: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "border-bottom-left-radius: 5px;"
+                       "border-top-left-radius:5px;"
+                       "background: rgb(80,80,80);}");
+
+    else if(style == ButtonStyle::SwitchLeftON)
+        return QString("QPushButton {"
+                       "color: white;"
+                       "border-right: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "background: rgb(35,35,35);"
+                       "border-bottom-right-radius: 5px;"
+                       "border-top-right-radius:5px;}"
+                       "QPushButton:pressed {"
+                       "color: white;"
+                       "border-right: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "border-bottom-right-radius: 5px;"
+                       "border-top-right-radius:5px;"
+                       "background: rgb(80,80,80);}");
+
+    else if(style == ButtonStyle::SwitchLeftOFF)
+        return QString("QPushButton {"
+                       "color: white;"
+                       "border-right: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "background:  qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                        "stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));"
+                       "border-bottom-right-radius: 5px;"
+                       "border-top-right-radius:5px;}"
+                       "QPushButton:pressed {"
+                       "color: white;"
+                       "border-right: 2px solid rgb(20,20,20);"
+                       "border-top: 2px solid rgb(20,20,20);"
+                       "border-bottom: 2px solid rgb(20,20,20);"
+                       "border-bottom-right-radius: 5px;"
+                       "border-top-right-radius:5px;"
+                       "background: rgb(80,80,80);}");
+
+    return QString("");
 }
 
 bool MainWindow::dataIsCorrect()
@@ -255,6 +348,7 @@ bool MainWindow::submit(ModSqlTableModel *&model)
                 ModSqlTableModel::isGroup = false;
             }
             model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+            ui->othersButton->click();
             model->select();
             return true;
         }
@@ -265,35 +359,31 @@ bool MainWindow::submit(ModSqlTableModel *&model)
 
 void MainWindow::on_addButton_clicked()
 {
-        static bool isSubmit = false;
-        if(!isSubmit) {
-            if(!sqlModel->isDirty()) {
-                if(sqlModel->insertRow(sqlModel->rowCount())) {
-                    qDebug() << ModSqlTableModel::isGroup << endl;
-                    ui->tableView->scrollToBottom();
-                    isSubmit = !isSubmit;
-                    ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
-                    ui->addButton->setStyleSheet("QPushButton:hover {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
-                                                "QPushButton {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
-                                                "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                                "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
-                }
-                else
-                    QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: Nie można dodać nowego wiersza.");
+    if(!addPersonState) {
+        if(!sqlModel->isDirty()) {
+            if(sqlModel->insertRow(sqlModel->rowCount())) {
+                ui->tableView->scrollToBottom();
+                addPersonState = !addPersonState;
+                ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
+                ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Submit));
+                ui->deleteButton->setIcon(QIcon(":/images/images/remove.png"));
+                ui->deleteButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Remove));
             }
             else
-                QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+                QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: Nie można dodać nowego wiersza.");
         }
-        else {
-            if(submit(sqlModel)) {
-            isSubmit = !isSubmit;
-            ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
-            ui->addButton->setStyleSheet("QPushButton:hover {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
-                                        "QPushButton {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
-                                        "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                        "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
-            }
+        else
+            QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
+    }
+    else {
+        if(submit(sqlModel)) {
+        addPersonState = !addPersonState;
+        ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
+        ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteButton->setIcon(QIcon(":/images/images/delete_person.png"));
+        ui->deleteButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
         }
+    }
 }
 
 void MainWindow::on_deleteButton_clicked()
@@ -312,6 +402,7 @@ void MainWindow::on_deleteButton_clicked()
                                 return;
                             }
                             sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+                            ui->othersButton->click();
                             sqlModel->select();
                             }
                     else
@@ -323,23 +414,29 @@ void MainWindow::on_deleteButton_clicked()
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
     }
+    else if(!addGroupState){
+        sqlModel->select();
+        addPersonState = !addPersonState;
+        ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
+        ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteButton->setIcon(QIcon(":/images/images/delete_person.png"));
+        ui->deleteButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+    }
     else
         QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
 }
 
 void MainWindow::on_addGroupButton_clicked()
 {
-        static bool isSubmit = false;
-        if(!isSubmit) {
+        if(!addGroupState) {
             if(!sqlModel->isDirty()) {
                 if(sqlModel->insertRow(sqlModel->rowCount())) {
                     ui->tableView->scrollToBottom();
-                    isSubmit = !isSubmit;
+                    addGroupState = !addGroupState;
                     ui->addGroupButton->setIcon(QIcon(":/images/images/submit.png"));
-                    ui->addGroupButton->setStyleSheet("QPushButton:hover {color: gray;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(35,35,35);}"
-                                                "QPushButton {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px; background: qlineargradient"
-                                                "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                                "QPushButton:pressed {color: white;border: 3px solid rgb(89,142,32);border-radius: 5px;background: rgb(80,80,80);}");
+                    ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Submit));
+                    ui->deleteGroup->setIcon(QIcon(":/images/images/remove.png"));
+                    ui->deleteGroup->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Remove));
 
                     sqlModel->setData(sqlModel->index(sqlModel->rowCount()-1,1), "-----");
                     sqlModel->setData(sqlModel->index(sqlModel->rowCount()-1,2), "-----");
@@ -353,12 +450,11 @@ void MainWindow::on_addGroupButton_clicked()
         }
         else {
             if(submit(sqlModel)) {
-            isSubmit = !isSubmit;
+            addGroupState = !addGroupState;
             ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
-            ui->addGroupButton->setStyleSheet("QPushButton:hover {color: gray;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(35,35,35);}"
-                                        "QPushButton {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px; background: qlineargradient"
-                                        "(x1:0, y1:0, x2:0, y2:1,stop: 0 rgba(80,80,80), stop: 0.7 rgb(35,35,35));}"
-                                        "QPushButton:pressed {color: white;border: 2px solid rgb(20,20,20);border-radius: 5px;background: rgb(80,80,80);}");
+            ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+            ui->deleteGroup->setIcon(QIcon(":/images/images/delete_group.png"));
+            ui->deleteGroup->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
             }
         }
 }
@@ -390,6 +486,14 @@ void MainWindow::on_deleteGroup_clicked()
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
     }
+    else if(!addPersonState){
+        sqlModel->select();
+        addGroupState = !addGroupState;
+        ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
+        ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteGroup->setIcon(QIcon(":/images/images/delete_group.png"));
+        ui->deleteGroup->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+    }
     else
         QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
 }
@@ -398,42 +502,9 @@ void MainWindow::on_sigmaButton_clicked()
 {
      if(!sqlModel->isDirty()) {
          ui->sigmaButton->setIconSize(QSize(35,35));
-         ui->sigmaButton->setStyleSheet("QPushButton {"
-                                            "color: white;"
-                                            "border-left: 2px solid rgb(20,20,20);"
-                                            "border-top: 2px solid rgb(20,20,20);"
-                                            "border-bottom: 2px solid rgb(20,20,20);"
-                                            "background: rgb(35,35,35);"
-                                            "border-bottom-left-radius: 5px;"
-                                            "border-top-left-radius:5px;}"
-                                            "QPushButton:pressed {"
-                                            "color: white;"
-                                            "border-left: 2px solid rgb(20,20,20);"
-                                            "border-top: 2px solid rgb(20,20,20);"
-                                            "border-bottom: 2px solid rgb(20,20,20);"
-                                            "border-bottom-left-radius: 5px;"
-                                            "border-top-left-radius:5px;"
-                                            "background: rgb(80,80,80);}");
-
+         ui->sigmaButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchRightON));
          ui->othersButton->setIconSize(QSize(16,16));
-         ui->othersButton->setStyleSheet("QPushButton {"
-                                            "color: white;"
-                                            "border-right: 2px solid rgb(20,20,20);"
-                                            "border-top: 2px solid rgb(20,20,20);"
-                                            "border-bottom: 2px solid rgb(20,20,20);"
-                                            "background:  qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                             "stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));"
-                                            "border-bottom-right-radius: 5px;"
-                                            "border-top-right-radius:5px;}"
-                                            "QPushButton:pressed {"
-                                            "color: white;"
-                                            "border-right: 2px solid rgb(20,20,20);"
-                                            "border-top: 2px solid rgb(20,20,20);"
-                                            "border-bottom: 2px solid rgb(20,20,20);"
-                                            "border-bottom-right-radius: 5px;"
-                                            "border-top-right-radius:5px;"
-                                            "background: rgb(80,80,80);}");
-
+         ui->othersButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchLeftOFF));
          sqlModel->setFilter("DepartureTime IS NULL");
          sqlModel->select();
          ui->tableView->scrollToBottom();
@@ -445,48 +516,14 @@ void MainWindow::on_othersButton_clicked()
 {
     if(!sqlModel->isDirty()) {
         ui->othersButton->setIconSize(QSize(35,35));
-        ui->othersButton->setStyleSheet("QPushButton {"
-                                           "color: white;"
-                                           "border-right: 2px solid rgb(20,20,20);"
-                                           "border-top: 2px solid rgb(20,20,20);"
-                                           "border-bottom: 2px solid rgb(20,20,20);"
-                                           "background: rgb(35,35,35);"
-                                           "border-bottom-right-radius: 5px;"
-                                           "border-top-right-radius:5px;}"
-                                           "QPushButton:pressed {"
-                                           "color: white;"
-                                           "border-right: 2px solid rgb(20,20,20);"
-                                           "border-top: 2px solid rgb(20,20,20);"
-                                           "border-bottom: 2px solid rgb(20,20,20);"
-                                           "border-bottom-right-radius: 5px;"
-                                           "border-top-right-radius:5px;"
-                                           "background: rgb(80,80,80);}");
-
+        ui->othersButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchLeftON));
         ui->sigmaButton->setIconSize(QSize(16,16));
-        ui->sigmaButton->setStyleSheet("QPushButton {"
-                                           "color: white;"
-                                           "border-left: 2px solid rgb(20,20,20);"
-                                           "border-top: 2px solid rgb(20,20,20);"
-                                           "border-bottom: 2px solid rgb(20,20,20);"
-                                           "background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                            "stop: 0 rgba(80,80,80), stop: 0.7 rgb(50,50,50));"
-                                           "border-bottom-left-radius: 5px;"
-                                           "border-top-left-radius:5px;}"
-                                           "QPushButton:pressed {"
-                                           "color: white;"
-                                           "border-left: 2px solid rgb(20,20,20);"
-                                           "border-top: 2px solid rgb(20,20,20);"
-                                           "border-bottom: 2px solid rgb(20,20,20);"
-                                           "border-bottom-left-radius: 5px;"
-                                           "border-top-left-radius:5px;"
-                                           "background: rgb(80,80,80);}");
-
+        ui->sigmaButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchRightOFF));
         sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
         sqlModel->select();
         ui->tableView->scrollToBottom();
     }
     else QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
-
 }
 
 void MainWindow::setIcon()
@@ -605,3 +642,4 @@ void MainWindow::setVisible(bool visible)
         minimizeAction->setFont(QFont("Segou UI", 9));
     }
 }
+
