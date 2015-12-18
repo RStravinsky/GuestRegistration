@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
             w.showMaximized();
             w.loadSqlModel();
             w.show();
+            w.showTrayIcon();
         }
         currentExitCode = a.exec();
     } while( currentExitCode == MainWindow::EXIT_CODE_REBOOT );

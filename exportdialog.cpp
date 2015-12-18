@@ -88,7 +88,7 @@ void ExportDialog::on_exportButton_clicked()
             QMessageBox::information(this,QString("Informacja"),QString("Data końcowa jest większa niż data początkowa."));
             return;
         }
-        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '"+stopDate.toString("yyyy-MM-dd")+"'");
+        sqlModel->setFilter("ArrivalTime between '"+startDate.toString("yyyy-MM-dd")+"' And '"+stopDate.addDays(1).toString("yyyy-MM-dd")+"'");
     }
     else {
         QString headerName;
@@ -115,9 +115,9 @@ void ExportDialog::on_pathButton_clicked()
 
 QTextTableFormat ExportDialog::tableFormat(TabFormat format)
 {
+    QTextTableFormat tableFormat;
     if(format == TabFormat::Table) {
 
-        QTextTableFormat tableFormat;
         tableFormat.setAlignment(Qt::AlignCenter);
         tableFormat.setCellSpacing(0);
         tableFormat.setCellPadding(3);
@@ -131,13 +131,12 @@ QTextTableFormat ExportDialog::tableFormat(TabFormat format)
                << QTextLength(QTextLength::PercentageLength, 18) << QTextLength(QTextLength::PercentageLength, 24);
 
         tableFormat.setColumnWidthConstraints(widths);
-        return tableFormat;
+
 
     }
 
     if(format == TabFormat::Header) {
 
-        QTextTableFormat tableFormat;
         tableFormat.setAlignment(Qt::AlignCenter);
         tableFormat.setCellSpacing(0);
         tableFormat.setCellPadding(3);
@@ -150,10 +149,9 @@ QTextTableFormat ExportDialog::tableFormat(TabFormat format)
         widths << QTextLength(QTextLength::PercentageLength, 10) << QTextLength(QTextLength::PercentageLength, 45) << QTextLength(QTextLength::PercentageLength, 45);
 
         tableFormat.setColumnWidthConstraints(widths);
-        return tableFormat;
     }
 
-
+    return tableFormat;
 }
 
 void ExportDialog::addHeaderToDocument(QTextDocument *document,QTextCursor *cursor)
