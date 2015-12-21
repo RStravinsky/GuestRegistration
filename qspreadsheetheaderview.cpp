@@ -49,13 +49,13 @@ void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
         if (res == cancel)
             model()->sort(6, Qt::AscendingOrder);
         if (res == cancelSort) {
-            emit setSQLFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+            emit setSQLFilter("Cancel");
         }
         if (res == sortPerson) {
-            emit setSQLFilter("Name != '-----'");
+            emit setSQLFilter("Person");
         }
         if (res == sortGroup) {
-            emit setSQLFilter("Name = '-----'");
+            emit setSQLFilter("Group");
         }
     }
 

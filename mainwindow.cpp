@@ -67,7 +67,6 @@ void MainWindow::loadSqlModel()
     ui->tableView->setItemDelegate(completerDelegate);
     ui->tableView->show();
 
-
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(on_timer_overflow()));
     timer->start(5000);
 }
@@ -140,7 +139,6 @@ void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
         HelpDialog helpDialog(this);
         helpDialog.exec();
     }
-
 }
 
 void MainWindow::on_timer_overflow()
@@ -563,7 +561,18 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::on_setSQLFilter(QString filter)
 {
-    sqlModel->setFilter(filter);
+    if(filter=="Person" && isSigmaFilter)
+        sqlModel->setFilter("Name != '-----' And DepartureTime IS NULL");
+    else if(filter=="Person" && !isSigmaFilter)
+        sqlModel->setFilter("Name != '-----' And (ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1)");
+    else if(filter=="Group" && isSigmaFilter)
+        sqlModel->setFilter("Name = '-----' And DepartureTime IS NULL");
+    else if(filter=="Group" && !isSigmaFilter)
+        sqlModel->setFilter("Name = '-----' And (ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1)");
+    else if(filter=="Cancel" && isSigmaFilter)
+        sqlModel->setFilter("DepartureTime IS NULL");
+    else if(filter=="Cancel" && !isSigmaFilter)
+        sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
 }
 
 void MainWindow::createActions()
@@ -573,7 +582,6 @@ void MainWindow::createActions()
     QFont wFont;
     wFont.setFamily("Segou UI");
     wFont.setPointSize(9);
-
 
     minimizeAction = new QAction(tr("Mi&nimalizuj"), this);
     minimizeAction->setFont(QFont("Segou UI", 9));
