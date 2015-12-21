@@ -308,18 +308,10 @@ bool MainWindow::dataIsCorrect()
     }
 
     else {
-        QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
-        QString surename = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
-
         if(sqlModel->index(sqlModel->rowCount()-1,1).data().toString().isEmpty() ||
            sqlModel->index(sqlModel->rowCount()-1,2).data().toString().isEmpty()) {
             QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię oraz nazwisko musi być uzupełnione."));
             return false;
-        }
-        if(name.contains(" ") || surename.contains(" ")) {
-             QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię lub nazwisko zawiera pusty znak (\" \")."));
-             return false;
-
         }
         return true;
     }

@@ -6,6 +6,8 @@
 #include <QLineEdit>
 #include <QAbstractItemView>
 #include <QScrollBar>
+#include <QRegExpValidator>
+#include <QRegExp>
 #include <modsqltablemodel.h>
 
 class CompleterDelegate : public QStyledItemDelegate
@@ -20,6 +22,12 @@ public:
     {
         Q_UNUSED(option)
         QLineEdit* lineEdit = new QLineEdit(parent);
+
+        if(index.column() == 4 || index.column() == 1 || index.column() == 2) {
+            QRegExp rx ("[A-Za-z0-9]{1,8}");
+            lineEdit->setValidator (new QRegExpValidator (rx));
+        }
+
         stringList.clear();
         setList(index.column(),stringList);
         QCompleter* completer = new QCompleter(stringList, lineEdit);
