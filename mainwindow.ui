@@ -32,6 +32,16 @@
     background-color: black;
 }
 
+#stackedWidget QListWidget {
+    background-color: #333333;
+    color:#fffff8;
+    gridline-color: #fffff8;
+    font-size: 12pt;
+	/*border: 2px solid solid gray;*/
+	border-radius: 11px;
+	padding: 5px;
+}
+
 #centralWidget QLineEdit {
    background: white;
   color: gray;
@@ -181,6 +191,10 @@ QScrollBar:up-arrow:vertical {
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
    background: none;
 }
+
+
+
+
 </string>
    </property>
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0" columnstretch="0,0,0,0,0,0,0,0,0,0,0">
@@ -217,7 +231,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
        </size>
       </property>
       <property name="toolTip">
-       <string>Odjazd osoby</string>
+       <string>Wyjście osoby</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover {
@@ -277,6 +291,9 @@ background: rgb(80,80,80);
         <width>100</width>
         <height>50</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>Wejście grupy/firmy</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover {
@@ -371,7 +388,7 @@ background: rgb(80,80,80);
        </size>
       </property>
       <property name="toolTip">
-       <string>Przyjazd osoby</string>
+       <string>Wejście osoby</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover {
@@ -493,6 +510,9 @@ background: rgb(80,80,80);
         <width>100</width>
         <height>50</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>Wyjście grupy/firmy</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover {
@@ -735,6 +755,9 @@ background: rgb(80,80,80);
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Eksport PDF</string>
+       </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -767,6 +790,9 @@ background: rgb(80,80,80);
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Pomoc</string>
+       </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -798,6 +824,9 @@ background: rgb(80,80,80);
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Wyloguj</string>
        </property>
        <property name="styleSheet">
         <string notr="true"/>

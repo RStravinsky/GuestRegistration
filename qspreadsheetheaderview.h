@@ -29,6 +29,9 @@ protected:
     void drawPrevButton(QPainter *painter, int logicalIndex) const;
     void drawNextButton(QPainter *painter, int logicalIndex) const;
 
+signals:
+    void setSQLFilter(QString);
+
 private:
 
 };

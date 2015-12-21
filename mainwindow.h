@@ -17,6 +17,8 @@
 #include <QtNetwork/QNetworkInterface>
 #include <QHeaderView>
 #include <QSystemTrayIcon>
+#include <QCompleter>
+#include <completerdelegate.h>
 #include <qspreadsheetheaderview.h>
 #include "logindialog.h"
 #include "modsqltablemodel.h"
@@ -51,7 +53,7 @@ private slots:
     void on_deleteGroup_clicked();
     void setIcon();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);   
-    void on_editFinished(QWidget*,QAbstractItemDelegate::EndEditHint);
+    void on_setSQLFilter(QString);
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);

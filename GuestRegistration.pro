@@ -20,14 +20,16 @@ SOURCES += main.cpp\
     modsqltablemodel.cpp \
     qspreadsheetheaderview.cpp \
     exportdialog.cpp \
-    helpdialog.cpp
+    helpdialog.cpp \
+    completerdelegate.cpp
 
 HEADERS  += mainwindow.h \
     logindialog.h \
     modsqltablemodel.h \
     qspreadsheetheaderview.h \
     exportdialog.h \
-    helpdialog.h
+    helpdialog.h \
+    completerdelegate.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \

@@ -63,7 +63,10 @@ void MainWindow::loadSqlModel()
     ui->tableView->setModel(proxyModel);
 
     configureTable();
+    CompleterDelegate * completerDelegate = new CompleterDelegate;
+    ui->tableView->setItemDelegate(completerDelegate);
     ui->tableView->show();
+
 
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(on_timer_overflow()));
     timer->start(5000);
@@ -92,18 +95,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         actualButton->setIconSize(QSize(80, 80));
         return true;
     }
-
-//    if (event->type() == QEvent::KeyPress)
-//       {
-//        if(obj == (QObject*)ui->tableView)
-//           {
-//               QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-//               if(keyEvent->key() == Qt::Key_Return)
-//               {
-
-//               }
-//           }
-//       }
 
     return false;
 }
@@ -196,6 +187,7 @@ void MainWindow::configureTable()
 
     QSpreadsheetHeaderView * header = new QSpreadsheetHeaderView(Qt::Horizontal,this);
     ui->tableView->setHorizontalHeader(header);
+    connect(header,SIGNAL(setSQLFilter(QString)),this,SLOT(on_setSQLFilter(QString)));
     ui->tableView->horizontalHeader()->setFixedHeight(30);
     QStringList headerList ({"Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
     for(int i=1; i<sqlModel->columnCount(); ++i) {
@@ -311,7 +303,7 @@ bool MainWindow::dataIsCorrect()
 {
     if(ModSqlTableModel::isGroup == true) {
         if(sqlModel->index(sqlModel->rowCount()-1,3).data().toString().isEmpty()) {
-            QMessageBox::information(this,QString("Informacja"),QString("Nie dodano grupy.\nPrzyczyna: Firma musi być uzupełniona."));
+            QMessageBox::information(this,QString("Informacja"),QString("Nie dodano grupy/firmy.\nPrzyczyna: Firma musi być uzupełniona."));
             return false;
         }
         return true;
@@ -342,7 +334,7 @@ bool MainWindow::submit(ModSqlTableModel *&model)
             if(!ModSqlTableModel::isGroup)
                 QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: "+model->lastError().text()+"");
             else {
-                QMessageBox::warning(this,"Informacja","Nie dodano grupy.\nPrzyczyna: "+model->lastError().text()+"");
+                QMessageBox::warning(this,"Informacja","Nie dodano grupy/firmy.\nPrzyczyna: "+model->lastError().text()+"");
                 ModSqlTableModel::isGroup = false;
             }
             return false;
@@ -351,7 +343,7 @@ bool MainWindow::submit(ModSqlTableModel *&model)
             if(!ModSqlTableModel::isGroup)
                 QMessageBox::information(this,"Informacja","Dodano osobę.");
             else {
-                QMessageBox::information(this,"Informacja","Dodano grupę.");
+                QMessageBox::information(this,"Informacja","Dodano grupę/firmę.");
                 ModSqlTableModel::isGroup = false;
             }
             if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
@@ -373,8 +365,10 @@ void MainWindow::on_addButton_clicked()
                 isPersonAdded = !isPersonAdded;
                 ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
                 ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Submit));
+                ui->addButton->setToolTip("Zatwierdź osobę");
                 ui->deleteButton->setIcon(QIcon(":/images/images/remove.png"));
                 ui->deleteButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Remove));
+                ui->deleteButton->setToolTip("Usuń dodany wiersz");
             }
             else
                 QMessageBox::warning(this,"Informacja","Nie dodano osoby.\nPrzyczyna: Nie można dodać nowego wiersza.");
@@ -387,8 +381,10 @@ void MainWindow::on_addButton_clicked()
         isPersonAdded = !isPersonAdded;
         ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
         ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->addButton->setToolTip("Wejście osoby");
         ui->deleteButton->setIcon(QIcon(":/images/images/delete_person.png"));
         ui->deleteButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteButton->setToolTip("Wyjście osoby");
         }
     }
 }
@@ -416,7 +412,7 @@ void MainWindow::on_deleteButton_clicked()
                         QMessageBox::information(this,QString("Informacja"),QString("Osoba już wyszła."));
                 }
                 else
-                    QMessageBox::information(this,QString("Informacja"),QString("Przycisk dotyczy osoby a nie grupy."));
+                    QMessageBox::information(this,QString("Informacja"),QString("Przycisk dotyczy osoby a nie grupy/firmy."));
             }
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
@@ -426,8 +422,10 @@ void MainWindow::on_deleteButton_clicked()
         isPersonAdded = !isPersonAdded;
         ui->addButton->setIcon(QIcon(":/images/images/add_person.png"));
         ui->addButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->addButton->setToolTip("Wejście osoby");
         ui->deleteButton->setIcon(QIcon(":/images/images/delete_person.png"));
         ui->deleteButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteButton->setToolTip("Wyjście osoby");
     }
     else
         QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
@@ -442,15 +440,17 @@ void MainWindow::on_addGroupButton_clicked()
                     isGroupAdded = !isGroupAdded;
                     ui->addGroupButton->setIcon(QIcon(":/images/images/submit.png"));
                     ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Submit));
+                    ui->addGroupButton->setToolTip("Zatwierdź grupę/firmę");
                     ui->deleteGroup->setIcon(QIcon(":/images/images/remove.png"));
                     ui->deleteGroup->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Remove));
+                    ui->deleteGroup->setToolTip("Usuń dodany wiersz");
 
                     sqlModel->setData(sqlModel->index(sqlModel->rowCount()-1,1), "-----");
                     sqlModel->setData(sqlModel->index(sqlModel->rowCount()-1,2), "-----");
                     ModSqlTableModel::isGroup = true;
                 }
                 else
-                    QMessageBox::warning(this,"Informacja","Nie dodano grupy.\nPrzyczyna: Nie można dodać nowego wiersza.");
+                    QMessageBox::warning(this,"Informacja","Nie dodano grupy/firmy.\nPrzyczyna: Nie można dodać nowego wiersza.");
             }
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
@@ -460,8 +460,10 @@ void MainWindow::on_addGroupButton_clicked()
             isGroupAdded = !isGroupAdded;
             ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
             ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+            ui->addGroupButton->setToolTip("Wejście grupy/firmy");
             ui->deleteGroup->setIcon(QIcon(":/images/images/delete_group.png"));
             ui->deleteGroup->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+            ui->deleteGroup->setToolTip("Wyjście grupy/firmy");
             }
         }
 }
@@ -486,10 +488,10 @@ void MainWindow::on_deleteGroup_clicked()
                             sqlModel->select();
                         }
                     else
-                        QMessageBox::information(this,QString("Informacja"),QString("Grupa już wyszła."));
+                        QMessageBox::information(this,QString("Informacja"),QString("Grupa/firma już wyszła."));
                 }
                 else
-                    QMessageBox::information(this,QString("Informacja"),QString("Przycisk dotyczy grupy a nie osoby."));
+                    QMessageBox::information(this,QString("Informacja"),QString("Przycisk dotyczy grupy/firmy a nie osoby."));
             }
             else
                 QMessageBox::information(this,QString("Informacja"),QString("Nie zaznaczono wiersza."));
@@ -500,8 +502,10 @@ void MainWindow::on_deleteGroup_clicked()
         ModSqlTableModel::isGroup = false;
         ui->addGroupButton->setIcon(QIcon(":/images/images/add_group.png"));
         ui->addGroupButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteGroup->setToolTip("Wejście grupy/firmy");
         ui->deleteGroup->setIcon(QIcon(":/images/images/delete_group.png"));
         ui->deleteGroup->setStyleSheet(setButtonsStyleSheet(ButtonStyle::Normal));
+        ui->deleteGroup->setToolTip("Wyjście grupy/firmy");
     }
     else
         QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
@@ -557,9 +561,9 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::on_editFinished(QWidget *, QAbstractItemDelegate::EndEditHint)
+void MainWindow::on_setSQLFilter(QString filter)
 {
-  qDebug() << "KUPA" << endl;
+    sqlModel->setFilter(filter);
 }
 
 void MainWindow::createActions()

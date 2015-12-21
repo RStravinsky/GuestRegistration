@@ -22,9 +22,14 @@ void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
         QMenu menu(this);
 
         QAction *hideCol = menu.addAction("Ukryj kolumnę");
+        menu.addSeparator();
         QAction *cancel = menu.addAction("Anuluj");
         QAction *sortAZ = menu.addAction("Sortuj A->Z");
         QAction *sortZA = menu.addAction("Sortuj Z->A");
+        menu.addSeparator();
+        QAction *cancelSort = menu.addAction("Anuluj");
+        QAction *sortPerson = menu.addAction("Sortuj wszystko: Osoba");
+        QAction *sortGroup = menu.addAction("Sortuj wszystko: Grupa");
 
         // Disable hide column if only one column remains. Otherwise
         // the gui is no more available to show them back.
@@ -42,7 +47,16 @@ void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
         if (res == sortZA)
             model()->sort(logicalIndex, Qt::DescendingOrder);
         if (res == cancel)
-            model()->sort(6, Qt::AscendingOrder);        
+            model()->sort(6, Qt::AscendingOrder);
+        if (res == cancelSort) {
+            emit setSQLFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+        }
+        if (res == sortPerson) {
+            emit setSQLFilter("Name != '-----'");
+        }
+        if (res == sortGroup) {
+            emit setSQLFilter("Name = '-----'");
+        }
     }
 
     // Catch previous arrow mouse click.
