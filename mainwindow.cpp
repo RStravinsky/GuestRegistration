@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-extern double dpiPercent;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -20,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadTrayIcon();
 }
+
+bool MainWindow::isPersonAdded = false;
+bool MainWindow::isGroupAdded = false;
 
 MainWindow::~MainWindow()
 {
@@ -127,18 +128,21 @@ void MainWindow::on_sendAccess(QString login,QString password)
 
 void MainWindow::on_mainButtonReleased(const QPushButton *mainButton)
 {
-    if( mainButton == ui->logoutButton )
-        qApp->exit( MainWindow::EXIT_CODE_REBOOT );
+    if(!sqlModel->isDirty()) {
+        if( mainButton == ui->logoutButton )
+            qApp->exit( MainWindow::EXIT_CODE_REBOOT );
 
-    if( mainButton == ui->generateButton ) {
-        ExportDialog exportDialog(this);
-        exportDialog.exec();
-    }
+        if( mainButton == ui->generateButton ) {
+            ExportDialog exportDialog(this);
+            exportDialog.exec();
+        }
 
-    if( mainButton == ui->helpButton ) {
-        HelpDialog helpDialog(this);
-        helpDialog.exec();
+        if( mainButton == ui->helpButton ) {
+            HelpDialog helpDialog(this);
+            helpDialog.exec();
+        }
     }
+    else QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
 }
 
 void MainWindow::on_timer_overflow()

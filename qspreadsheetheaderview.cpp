@@ -18,46 +18,54 @@ void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
 
     int logicalIndex = logicalIndexAt(event->pos());
 
+    qDebug() << MainWindow::isGroupAdded << endl;
+    qDebug() << MainWindow::isPersonAdded << endl;
+
     if (buttonMenuRect(logicalIndex).contains(event->pos())) {
-        QMenu menu(this);
 
-        QAction *hideCol = menu.addAction("Ukryj kolumnę");
-        menu.addSeparator();
-        QAction *cancel = menu.addAction("Anuluj");
-        QAction *sortAZ = menu.addAction("Sortuj A->Z");
-        QAction *sortZA = menu.addAction("Sortuj Z->A");
-        menu.addSeparator();
-        QAction *cancelSort = menu.addAction("Anuluj");
-        QAction *sortPerson = menu.addAction("Sortuj wszystko: Osoba");
-        QAction *sortGroup = menu.addAction("Sortuj wszystko: Grupa");
+        if(!MainWindow::isGroupAdded && !MainWindow::isPersonAdded) { // isDirty()
+            QMenu menu(this);
 
-        // Disable hide column if only one column remains. Otherwise
-        // the gui is no more available to show them back.
-        hideCol->setEnabled(hiddenSectionCount() < count() - 1);
+            QAction *hideCol = menu.addAction("Ukryj kolumnę");
+            menu.addSeparator();
+            QAction *cancel = menu.addAction("Anuluj");
+            QAction *sortAZ = menu.addAction("Sortuj A->Z");
+            QAction *sortZA = menu.addAction("Sortuj Z->A");
+            menu.addSeparator();
+            QAction *cancelSort = menu.addAction("Anuluj");
+            QAction *sortPerson = menu.addAction("Sortuj wszystko: Osoba");
+            QAction *sortGroup = menu.addAction("Sortuj wszystko: Grupa");
 
-        QAction *res = menu.exec(mapToGlobal(event->pos()));
+            // Disable hide column if only one column remains. Otherwise
+            // the gui is no more available to show them back.
+            hideCol->setEnabled(hiddenSectionCount() < count() - 1);
 
-        if (res == hideCol) {
-             hideSection(logicalIndex);
-             updateSection(logicalIndex-1);
-         }
+            QAction *res = menu.exec(mapToGlobal(event->pos()));
 
-        if (res == sortAZ)
-            model()->sort(logicalIndex, Qt::AscendingOrder);
-        if (res == sortZA)
-            model()->sort(logicalIndex, Qt::DescendingOrder);
-        if (res == cancel)
-            model()->sort(6, Qt::AscendingOrder);
-        if (res == cancelSort) {
-            emit setSQLFilter("Cancel");
+            if (res == hideCol) {
+                 hideSection(logicalIndex);
+                 updateSection(logicalIndex-1);
+             }
+
+            if (res == sortAZ)
+                model()->sort(logicalIndex, Qt::AscendingOrder);
+            if (res == sortZA)
+                model()->sort(logicalIndex, Qt::DescendingOrder);
+            if (res == cancel)
+                model()->sort(6, Qt::AscendingOrder);
+            if (res == cancelSort) {
+                emit setSQLFilter("Cancel");
+            }
+            if (res == sortPerson) {
+                emit setSQLFilter("Person");
+            }
+            if (res == sortGroup) {
+                emit setSQLFilter("Group");
+            }
         }
-        if (res == sortPerson) {
-            emit setSQLFilter("Person");
-        }
-        if (res == sortGroup) {
-            emit setSQLFilter("Group");
-        }
+        else QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
     }
+
 
     // Catch previous arrow mouse click.
     if (prevRect(logicalIndex).contains(event->pos())) {
@@ -83,6 +91,7 @@ void QSpreadsheetHeaderView::mouseMoveEvent(QMouseEvent * event)
 
 void QSpreadsheetHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const
 {
+
     painter->save();
 
     QHeaderView::paintSection(painter, rect, logicalIndex);
@@ -99,7 +108,6 @@ void QSpreadsheetHeaderView::paintSection(QPainter *painter, const QRect &rect, 
     if (isSectionHidden(logicalIndex + 1) ) {
         drawNextButton(painter, logicalIndex);
     }
-
 
     QPoint pos = mapFromGlobal(QCursor::pos());
     if (rect.contains(pos)) {

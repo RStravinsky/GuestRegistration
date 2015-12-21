@@ -2,7 +2,8 @@
 #define QSPREADSHEETHEADERVIEW_H
 
 #include <QHeaderView>
-#include <QDebug>
+#include <QMessageBox>
+#include <mainwindow.h>
 
 /*!
     \class QSpreadsheetHeaderView

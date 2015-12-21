@@ -48,7 +48,6 @@ void LoginDialog::on_loginButton_clicked()
 
     if (!connectToDatabase(username,password)) {
         QMessageBox::information(this,"Informacja", "Nie uzyskano dostępu.");
-        //ui->userLineEdit->clear();
         ui->passwordLineEdit->clear();
         ui->passwordLineEdit->setFocus();
     }

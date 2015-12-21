@@ -39,6 +39,8 @@ public:
     void loadSqlModel();
     void setVisible(bool visible) Q_DECL_OVERRIDE;
     void showTrayIcon();
+    static bool isPersonAdded;
+    static bool isGroupAdded;
 
 private slots:
     void on_sendAccess(QString login,QString password);
@@ -76,8 +78,6 @@ private:
     ModSqlTableModel * sqlModel;
     QSortFilterProxyModel * proxyModel;
     QTimer *timer;
-    bool isPersonAdded{false};
-    bool isGroupAdded{false};
     bool isSigmaFilter{false};
 
     QSystemTrayIcon * trayIcon;
