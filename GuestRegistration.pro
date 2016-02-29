@@ -10,7 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = GuestRegistration
 TEMPLATE = app
-RC_ICON = icon.ico
 CONFIG += debug
 CONFIG += c++11
 
@@ -38,3 +37,5 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     resources.qrc
+
+RC_ICONS = \images\icon.ico

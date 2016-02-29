@@ -55,7 +55,7 @@ private slots:
     void on_deleteGroup_clicked();
     void setIcon();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);   
-    void on_setSQLFilter(QString);
+    void on_setSQLFilter();
 
 signals:
     void mainButtonReleased(const QPushButton * mainButton);

@@ -12,14 +12,13 @@ QSpreadsheetHeaderView::QSpreadsheetHeaderView(Qt::Orientation orientation, QWid
     setAttribute(Qt::WA_Hover, true);
 }
 
+QString QSpreadsheetHeaderView::filter = "Cancel";
+
 void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
 {
     QHeaderView::mousePressEvent(event);
 
     int logicalIndex = logicalIndexAt(event->pos());
-
-    qDebug() << MainWindow::isGroupAdded << endl;
-    qDebug() << MainWindow::isPersonAdded << endl;
 
     if (buttonMenuRect(logicalIndex).contains(event->pos())) {
 
@@ -27,14 +26,31 @@ void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
             QMenu menu(this);
 
             QAction *hideCol = menu.addAction("Ukryj kolumnę");
+//            menu.addSeparator();
+//            QAction *cancel = menu.addAction("Anuluj");
+//            QAction *sortAZ = menu.addAction("Sortuj A->Z");
+//            QAction *sortZA = menu.addAction("Sortuj Z->A");
             menu.addSeparator();
-            QAction *cancel = menu.addAction("Anuluj");
-            QAction *sortAZ = menu.addAction("Sortuj A->Z");
-            QAction *sortZA = menu.addAction("Sortuj Z->A");
-            menu.addSeparator();
+            QAction *sortPerson;
+            QAction *sortGroup;
+
             QAction *cancelSort = menu.addAction("Anuluj");
-            QAction *sortPerson = menu.addAction("Sortuj wszystko: Osoba");
-            QAction *sortGroup = menu.addAction("Sortuj wszystko: Grupa");
+
+            if(filter=="Cancel") {
+                sortPerson = menu.addAction("Sortuj wszystko: Osoba");
+                sortGroup = menu.addAction("Sortuj wszystko: Grupa");
+            }
+
+            if(filter=="Person") {
+                sortPerson = menu.addAction(QIcon(":/images/images/submit.png"),"     Sortuj wszystko: Osoba");
+                sortGroup = menu.addAction("Sortuj wszystko: Grupa");
+            }
+
+            if(filter=="Group") {
+                sortPerson = menu.addAction("Sortuj wszystko: Osoba");
+                sortGroup = menu.addAction(QIcon(":/images/images/submit.png"),"     Sortuj wszystko: Grupa");
+            }
+
 
             // Disable hide column if only one column remains. Otherwise
             // the gui is no more available to show them back.
@@ -47,25 +63,27 @@ void QSpreadsheetHeaderView::mousePressEvent ( QMouseEvent * event )
                  updateSection(logicalIndex-1);
              }
 
-            if (res == sortAZ)
-                model()->sort(logicalIndex, Qt::AscendingOrder);
-            if (res == sortZA)
-                model()->sort(logicalIndex, Qt::DescendingOrder);
-            if (res == cancel)
-                model()->sort(6, Qt::AscendingOrder);
+//            if (res == sortAZ)
+//                model()->sort(logicalIndex, Qt::AscendingOrder);
+//            if (res == sortZA)
+//                model()->sort(logicalIndex, Qt::DescendingOrder);
+//            if (res == cancel)
+//                model()->sort(6, Qt::AscendingOrder);
             if (res == cancelSort) {
-                emit setSQLFilter("Cancel");
+                filter = "Cancel";
+                emit setSQLFilter();
             }
             if (res == sortPerson) {
-                emit setSQLFilter("Person");
+                filter = "Person";
+                emit setSQLFilter();
             }
             if (res == sortGroup) {
-                emit setSQLFilter("Group");
+                filter = "Group";
+                emit setSQLFilter();
             }
         }
         else QMessageBox::information(this,QString("Informacja"),QString("Nie zatwierdzono."));
     }
-
 
     // Catch previous arrow mouse click.
     if (prevRect(logicalIndex).contains(event->pos())) {

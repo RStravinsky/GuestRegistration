@@ -160,8 +160,6 @@ void ExportDialog::addHeaderToDocument(QTextDocument *document,QTextCursor *curs
     document->addResource(QTextDocument::ImageResource, QUrl(":/images/images/sigma.png"), logoImage);
 
     QTextTable *headerTable = cursor->insertTable(1, 3, tableFormat(TabFormat::Header));
-    //headerTable->mergeCells(1,0,1,3);
-
     QTextBlockFormat blockFormat;
     QTextImageFormat logoFormat;
     logoFormat.setName(":/images/images/sigma.png");

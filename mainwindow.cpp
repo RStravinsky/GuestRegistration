@@ -189,7 +189,7 @@ void MainWindow::configureTable()
 
     QSpreadsheetHeaderView * header = new QSpreadsheetHeaderView(Qt::Horizontal,this);
     ui->tableView->setHorizontalHeader(header);
-    connect(header,SIGNAL(setSQLFilter(QString)),this,SLOT(on_setSQLFilter(QString)));
+    connect(header,SIGNAL(setSQLFilter()),this,SLOT(on_setSQLFilter()));
     ui->tableView->horizontalHeader()->setFixedHeight(30);
     QStringList headerList ({"Imię", "Nazwisko", "Firma", "Tablica rejestracyjna", "Cel wizyty", "Czas przyjazdu", "Czas wyjazdu"});
     for(int i=1; i<sqlModel->columnCount(); ++i) {
@@ -200,7 +200,7 @@ void MainWindow::configureTable()
     ui->tableView->horizontalHeader()->setFont(Font);
     ui->tableView->horizontalHeader()->setVisible(true);
 
-    ui->tableView->verticalHeader()->setFixedWidth(30);
+    ui->tableView->verticalHeader()->setFixedWidth(50);
     ui->tableView->hideColumn(0);
     ui->tableView->setFont(Font);
     ui->tableView->scrollToBottom();
@@ -308,13 +308,23 @@ bool MainWindow::dataIsCorrect()
             QMessageBox::information(this,QString("Informacja"),QString("Nie dodano grupy/firmy.\nPrzyczyna: Firma musi być uzupełniona."));
             return false;
         }
+        if(sqlModel->index(sqlModel->rowCount()-1,4).data().toString().contains(" ")) {
+            QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Tablica rejestracyjna zawiera znak pusty (\" \")."));
+            return false;
+        }
         return true;
     }
 
     else {
-        if(sqlModel->index(sqlModel->rowCount()-1,1).data().toString().isEmpty() ||
-           sqlModel->index(sqlModel->rowCount()-1,2).data().toString().isEmpty()) {
+        QString name = sqlModel->index(sqlModel->rowCount()-1,1).data().toString();
+        QString surname = sqlModel->index(sqlModel->rowCount()-1,2).data().toString();
+
+        if(name.isEmpty() || surname.isEmpty()) {
             QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię oraz nazwisko musi być uzupełnione."));
+            return false;
+        }
+        if(name.contains(" ") || surname.contains(" ")) {
+            QMessageBox::information(this,QString("Informacja"),QString("Nie dodano osoby.\nPrzyczyna: Imię oraz nazwisko zawiera znak pusty (\" \")."));
             return false;
         }
         return true;
@@ -340,8 +350,7 @@ bool MainWindow::submit(ModSqlTableModel *&model)
                 QMessageBox::information(this,"Informacja","Dodano grupę/firmę.");
                 ModSqlTableModel::isGroup = false;
             }
-            if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
-            else model->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+            on_setSQLFilter();
             model->select();
             return true;
         }
@@ -355,6 +364,7 @@ void MainWindow::on_addButton_clicked()
     if(!isPersonAdded) {
         if(!sqlModel->isDirty()) {
             if(sqlModel->insertRow(sqlModel->rowCount())) {
+                ui->lineEdit->clear();
                 ui->tableView->scrollToBottom();
                 isPersonAdded = !isPersonAdded;
                 ui->addButton->setIcon(QIcon(":/images/images/submit.png"));
@@ -398,8 +408,7 @@ void MainWindow::on_deleteButton_clicked()
                                 QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
                                 return;
                             }
-                            if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
-                            else sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+                            on_setSQLFilter();
                             sqlModel->select();
                             }
                     else
@@ -430,6 +439,7 @@ void MainWindow::on_addGroupButton_clicked()
         if(!isGroupAdded) {
             if(!sqlModel->isDirty()) {
                 if(sqlModel->insertRow(sqlModel->rowCount())) {
+                    ui->lineEdit->clear();
                     ui->tableView->scrollToBottom();
                     isGroupAdded = !isGroupAdded;
                     ui->addGroupButton->setIcon(QIcon(":/images/images/submit.png"));
@@ -477,8 +487,7 @@ void MainWindow::on_deleteGroup_clicked()
                                 QMessageBox::information(this,QString("Informacja"),QString("Polecenie nie powidoło się."));
                                 return;
                             }
-                            if(isSigmaFilter) sqlModel->setFilter("DepartureTime IS NULL");
-                            else sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+                            on_setSQLFilter();
                             sqlModel->select();
                         }
                     else
@@ -513,7 +522,7 @@ void MainWindow::on_sigmaButton_clicked()
          ui->sigmaButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchRightON));
          ui->othersButton->setIconSize(QSize(16,16));
          ui->othersButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchLeftOFF));
-         sqlModel->setFilter("DepartureTime IS NULL");
+         on_setSQLFilter();
          sqlModel->select();
          ui->tableView->scrollToBottom();
      }
@@ -528,7 +537,7 @@ void MainWindow::on_othersButton_clicked()
         ui->othersButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchLeftON));
         ui->sigmaButton->setIconSize(QSize(16,16));
         ui->sigmaButton->setStyleSheet(setButtonsStyleSheet(ButtonStyle::SwitchRightOFF));
-        sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
+        on_setSQLFilter();
         sqlModel->select();
         ui->tableView->scrollToBottom();
     }
@@ -555,19 +564,19 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::on_setSQLFilter(QString filter)
+void MainWindow::on_setSQLFilter()
 {
-    if(filter=="Person" && isSigmaFilter)
+    if(QSpreadsheetHeaderView::filter=="Person" && isSigmaFilter)
         sqlModel->setFilter("Name != '-----' And DepartureTime IS NULL");
-    else if(filter=="Person" && !isSigmaFilter)
+    else if(QSpreadsheetHeaderView::filter=="Person" && !isSigmaFilter)
         sqlModel->setFilter("Name != '-----' And (ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1)");
-    else if(filter=="Group" && isSigmaFilter)
+    else if(QSpreadsheetHeaderView::filter=="Group" && isSigmaFilter)
         sqlModel->setFilter("Name = '-----' And DepartureTime IS NULL");
-    else if(filter=="Group" && !isSigmaFilter)
+    else if(QSpreadsheetHeaderView::filter=="Group" && !isSigmaFilter)
         sqlModel->setFilter("Name = '-----' And (ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1)");
-    else if(filter=="Cancel" && isSigmaFilter)
+    else if(QSpreadsheetHeaderView::filter=="Cancel" && isSigmaFilter)
         sqlModel->setFilter("DepartureTime IS NULL");
-    else if(filter=="Cancel" && !isSigmaFilter)
+    else if(QSpreadsheetHeaderView::filter=="Cancel" && !isSigmaFilter)
         sqlModel->setFilter("ArrivalTime between DATE_SUB(CURDATE()+1,INTERVAL 30 DAY) And CURDATE()+1");
 }
 

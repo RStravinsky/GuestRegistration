@@ -10,6 +10,8 @@ CompleterDelegate::CompleterDelegate()
 void CompleterDelegate::setList(const int column, QStringList &stringList) const
 {
     for(int i=0; i<sqlModel->rowCount();++i)
-        stringList << sqlModel->index(i,column).data().toString();
+        if(! stringList.contains(sqlModel->index(i,column).data().toString()))
+            stringList << sqlModel->index(i,column).data().toString();
+
 }
 

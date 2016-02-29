@@ -23,8 +23,8 @@ public:
         Q_UNUSED(option)
         QLineEdit* lineEdit = new QLineEdit(parent);
 
-        if(index.column() == 4 || index.column() == 1 || index.column() == 2) {
-            QRegExp rx ("[A-Za-z0-9]{1,8}");
+        if(index.column() == 4) {
+            QRegExp rx ("[A-Za0-9]{1,12}");
             lineEdit->setValidator (new QRegExpValidator (rx));
         }
 

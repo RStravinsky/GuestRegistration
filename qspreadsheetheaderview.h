@@ -16,6 +16,7 @@ class QSpreadsheetHeaderView : public QHeaderView
     Q_OBJECT
 public:
     QSpreadsheetHeaderView(Qt::Orientation orientation, QWidget * parent = 0);
+    static QString filter;
 protected:
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
@@ -31,7 +32,7 @@ protected:
     void drawNextButton(QPainter *painter, int logicalIndex) const;
 
 signals:
-    void setSQLFilter(QString);
+    void setSQLFilter();
 
 private:
 
